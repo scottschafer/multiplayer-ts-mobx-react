@@ -1,0 +1,67 @@
+.SuperGhostGamePage {
+  font-size: 36px;
+
+  .progress-bar {
+    transition: 0ms;
+  }
+
+  .current-player {
+    background-color: lightskyblue;
+
+    .btn-warning,
+    .btn-danger {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+  }
+
+  .playerInputContainer {
+    font-family: monospace;
+    display: inline-block;
+    margin: 20px;
+
+    input {
+      width: 36px;
+      text-align: center;
+    }
+  }
+
+  .inputHelp {
+    font-style: italic;
+    font-size: 18px;
+    color: gray;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 18px;
+    margin: 20px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .player-eliminated {
+    svg {
+      color: red;
+      margin-right: 20px;
+    }
+
+    label {
+      color: gray;
+    }
+  }
+}

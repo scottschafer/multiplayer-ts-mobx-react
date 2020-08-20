@@ -1,0 +1,72 @@
+import React from 'react';
+import { render } from '@testing-library/react';
+import Attendees, { AttendeesProps } from './Attendees';
+import { Room } from '../models/room';
+import { Game } from '../models/game';
+import { Player } from '../models/player';
+
+const testUsers = [
+  new Player({
+    displayName: 'Bob1',
+    uid: 'u101',
+    photoURL: 'https://Bob1.jpg'
+  }),
+  new Player({
+    displayName: 'Bob2',
+    uid: 'u102',
+    photoURL: 'https://Bob2.jpg'
+  }),
+  new Player({
+    displayName: 'Bob1',
+    uid: 'u103',
+    photoURL: 'https://Bob2.jpg'
+  })
+];
+
+function getPlayerListProps(
+  handlers?: {
+    onClickJoinGame: ((user: Player) => void);
+    onClickLeaveGame: ((user: Player) => void);
+
+    onClickAdmitUser: ((user: Player) => void);
+    onClickBlockUser: ((user: Player) => void);
+    onClickUnblockUser: ((user: Player) => void);
+    onClickEjectUser: ((user: Player) => void);
+  }
+
+): AttendeesProps {
+  const game = new Game();
+  const currentUser: firebase.User = testUsers[0] as any as firebase.User;
+  const room = new Room({
+    usersInRoom: testUsers
+  });
+
+  const {
+    onClickJoinGame,
+    onClickLeaveGame,
+    onClickAdmitUser,
+    onClickBlockUser,
+    onClickUnblockUser,
+    onClickEjectUser
+  } = (handlers || {});
+
+  return {
+    room,
+    game,
+    currentUser,
+    onClickJoinGame,
+    onClickLeaveGame,
+    onClickAdmitUser,
+    onClickBlockUser,
+    onClickUnblockUser,
+    onClickEjectUser
+  };
+}
+
+test('renders learn react link', () => {
+  const props = getPlayerListProps();
+
+  const { getByText } = render(<Attendees {...props} />);
+  // const linkElement = getByText(/learn react/i);
+  // expect(linkElement).toBeInTheDocument();
+});

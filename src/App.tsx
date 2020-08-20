@@ -1,26 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom';
 import './App.css';
+import { Routes } from './constants/routes';
+import LandingPage from './pages/LandingPage';
+import RoomPage from './pages/RoomPage';
+import SignInPage from './pages/SignInPage';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => (
+  <Router>
+    <div className="app">
+      <Route exact={true} path={Routes.LANDING} component={() => <LandingPage />} />
+      <Route exact={true} path={Routes.SIGN_IN} component={() => <SignInPage />} />
+      <Route exact={true} path={Routes.ROOM} component={() => <RoomPage />} />
     </div>
-  );
-}
+  </Router>
+);
 
 export default App;

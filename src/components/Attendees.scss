@@ -1,0 +1,28 @@
+.Attendees {
+
+  .user-description {
+    label {
+      min-width: 300px;
+    }
+
+    img {
+      height: 30px
+    }
+  }
+
+  .current-player {
+    background-color: lightgray;
+  }
+
+  .eliminated {
+    label {
+      color: gray;
+      opacity: .5;
+    }
+
+    svg {
+      color: red;
+      margin-right: 10px;
+    }
+  }
+}
