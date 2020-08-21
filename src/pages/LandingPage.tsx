@@ -80,6 +80,9 @@ const LandingPage = observer(() => {
           {joinCodeError && <span><FontAwesomeIcon icon={faExclamationTriangle} /> Room not found!</span>}
           {joinCodeLink && <Link to={joinCodeLink}>Join room</Link>}
         </h2>
+
+        <br /><br /><br />
+        <h3><a href="https://github.com/scottschafer/multiplayer-ts-mobx-react">Project on github</a></h3>
       </Container>
     </>
   );
