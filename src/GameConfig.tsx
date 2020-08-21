@@ -33,7 +33,11 @@ const config: GameConfig = {
     gameModelFactory: SuperGhostGame,
     // override to render your view:
     renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>,
-    renderLandingPageTitle: () => <h1>Superghost!</h1>,
+    renderLandingPageTitle: () =>
+      <>
+        <h1>Superghost!</h1>
+        <p>A game of spelling and betrayal. Also known as "Lexicant". <a href='https://en.wikipedia.org/wiki/Ghost_(game)'>Rules here.</a></p>
+      </>,
   },
   config: {
     // Only show the "Erase DB" button when on localhost. This is useful for development. It blows away all data.

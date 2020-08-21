@@ -54,19 +54,6 @@ const LandingPage = observer(() => {
           <Link to={Routes.SIGN_IN}>Sign in</Link>}
 
         {config.factory.renderLandingPageTitle()}
-        <br />
-
-        {/* Join a room */}
-        <h2>To join a room, enter code here:<br />
-          <input
-            className={'input-room-code ' + (enteredJoinCode.length ? 'uppercase' : '')}
-            value={enteredJoinCode}
-            placeholder='Room code'
-            onChange={handleChangeInputJoinRoom}></input><br />
-          {joinCodeError && <span><FontAwesomeIcon icon={faExclamationTriangle} /> Room not found!</span>}
-          {joinCodeLink && <Link to={joinCodeLink}>Join room</Link>}
-          <br />
-        </h2>
 
         {/* Create a room */}
         {userStore.user && <>
@@ -78,9 +65,21 @@ const LandingPage = observer(() => {
               <label className='new-room-code'>{roomStore.createdJoinCode}</label><br />
                 <Link to={`${Routes.ROOM.replace(':id', roomStore.createdJoinCode)}`}>Join room</Link>
               </span>}
-
+            <br />
+            <br />
           </h2>
         </>}
+
+        {/* Join a room */}
+        <h2>To join a room, enter code here:<br />
+          <input
+            className={'input-room-code ' + (enteredJoinCode.length ? 'uppercase' : '')}
+            value={enteredJoinCode}
+            placeholder='Room code'
+            onChange={handleChangeInputJoinRoom}></input><br />
+          {joinCodeError && <span><FontAwesomeIcon icon={faExclamationTriangle} /> Room not found!</span>}
+          {joinCodeLink && <Link to={joinCodeLink}>Join room</Link>}
+        </h2>
       </Container>
     </>
   );
