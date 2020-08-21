@@ -25,7 +25,7 @@ const LandingPage = observer(() => {
   const handleChangeInputJoinRoom = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       roomStore.setEnteredRoomCode(e.target.value);
-    }, []);
+    }, [roomStore]);
 
   const handleClickEraseDB = useCallback(
     () => {

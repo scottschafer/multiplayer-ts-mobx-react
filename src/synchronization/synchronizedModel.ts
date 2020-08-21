@@ -51,7 +51,6 @@ export class SynchronizedModel {
 
 
   private toObject() {
-    const self = this as MakeWritable<SynchronizedModel>;
     const vo = JSON.parse(JSON.stringify(this));
     return vo;
   }

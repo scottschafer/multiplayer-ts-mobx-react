@@ -3,14 +3,12 @@ import React from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { Redirect } from 'react-router-dom';
 import { Routes } from '../constants/routes';
-import { firebaseAppAuth } from '../firebase/firebaseApp';
 import { firebaseAuthConfig } from '../firebase/firebaseConfig';
-// import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
 
 const SignInPage = () => {
 
-  const { userStore, roomStore, gameStore, config } = useStores();
+  const { userStore, config } = useStores();
 
   if (userStore.user) {
     return <Redirect to={Routes.LANDING}></Redirect>;
@@ -22,11 +20,6 @@ const SignInPage = () => {
       <StyledFirebaseAuth uiConfig={firebaseAuthConfig} firebaseAuth={firebase.auth()} />
     </div>);
 }
-
-
-const providers = {
-  googleProvider: new firebase.auth.GoogleAuthProvider(),
-};
 
 
 export default SignInPage;

@@ -31,7 +31,7 @@ export const getConfig = () => {
       renderLandingPageTitle: () => <h1>Superghost!</h1>,
     },
     config: {
-      showEraseDB: true,
+      showEraseDB: (window.origin.includes('http://localhost')),
     },
     authentication: {
       renderSignInTitle: () => <h1>Sign in to play Superghost!</h1>,
@@ -41,5 +41,3 @@ export const getConfig = () => {
   };
   return config;
 };
-
-// GlobalGameConfig.factory.renderLandingPageTitle = () => <SuperGhostGamePage></SuperGhostGamePage>;
