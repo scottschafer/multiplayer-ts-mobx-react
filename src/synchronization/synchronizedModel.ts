@@ -1,14 +1,11 @@
 import { MakeWritable } from "../utils/changeProperties";
 import { firebaseApp } from '../firebase/firebaseApp';
-import { toMinifiedObject, assignObject } from '../utils/objectUtils';
+import { assignObject } from '../utils/objectUtils';
 
-export class WatchableModel {
+export class SynchronizedModel {
   readonly key: string;
-  // readonly version: number = 0;
-  // readonly lastUpdater: string = '';
-  // readonly lastSetVersion: object;
 
-  static dbPath: string = 'xxx';
+  static dbPath: string = '';
 
   constructor(public readonly dbPath: string) {
   }
@@ -45,33 +42,17 @@ export class WatchableModel {
     } else {
       const pushResult = database.ref(this.dbPath).push(obj);
       pushResult.then(result => {
-        const asWriteable = this as MakeWritable<WatchableModel>;
+        const asWriteable = this as MakeWritable<SynchronizedModel>;
         asWriteable.key = result.key;
       });
       return pushResult;
     }
   }
 
-  // shouldUpdate(data: any) {
-  //   if (this.version === data.version && this.lastUpdater === data.lastUpdater) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
-  getUpdates(compareWith: object) {
-
-  }
 
   private toObject() {
-    const self = this as MakeWritable<WatchableModel>;
-    // ++self.version;
-    // self.lastUpdater = firebaseApp.auth().currentUser?.uid || '';
+    const self = this as MakeWritable<SynchronizedModel>;
     const vo = JSON.parse(JSON.stringify(this));
     return vo;
   }
-
-  // private get asWriteable() {
-  //   return 
-  // }
 }

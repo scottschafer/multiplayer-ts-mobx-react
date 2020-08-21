@@ -1,6 +1,6 @@
 import { observable } from "mobx";
 import { MakeOptional } from "../utils/changeProperties";
-import { WatchableModel } from "./watchableModel";
+import { SynchronizedModel } from "../synchronization/synchronizedModel";
 
 export class Message {
   message: string;
@@ -9,7 +9,7 @@ export class Message {
   to: string;
 }
 
-export class Chat extends WatchableModel {
+export class Chat extends SynchronizedModel {
   readonly roomCode: string;
   @observable messages: Array<Message> = [];
 

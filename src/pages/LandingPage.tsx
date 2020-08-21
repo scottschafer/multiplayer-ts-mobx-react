@@ -1,31 +1,30 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react';
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import { Link } from 'react-router-dom';
-import withFirebaseAuth, { WrappedComponentProps } from 'react-with-firebase-auth';
 import { Routes } from '../constants/routes';
-import { firebaseApp, firebaseAppAuth } from '../firebase/firebaseApp';
+import { firebaseApp } from '../firebase/firebaseApp';
+// import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
-import { GlobalGameConfig } from '../GameConfig';
+import './LandingPage.scss';
 
 
-const LandingPage = observer(({ user, signOut }: WrappedComponentProps) => {
+const LandingPage = observer(() => {
 
-  const { userStore, roomStore } = useStores();
-  const [joinRoomCode, setJoinRoomCode] = useState('');
-
-  userStore.setUser(user);
+  const { config, userStore, roomStore } = useStores();
 
   const handleClickAddRoom = useCallback(
     () => {
-      roomStore.createNewRoom() // .addNewRoom(roomName)
-    }, [roomStore]); //[roomName]);
+      roomStore.createNewRoom()
+    }, [roomStore]);
 
   const handleChangeInputJoinRoom = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setJoinRoomCode(e.target.value);
+      roomStore.setEnteredRoomCode(e.target.value);
     }, []);
 
   const handleClickEraseDB = useCallback(
@@ -38,56 +37,53 @@ const LandingPage = observer(({ user, signOut }: WrappedComponentProps) => {
       alert('Database has been erased!');
     }, []);
 
+  const { enteredJoinCode, joinCodeError, joinCodeLink } = roomStore;
+
   return (
     <>
-      <Container>
-        {GlobalGameConfig.config.showEraseDB &&
-          <p>
-            <Button onClick={handleClickEraseDB}>Erase Database</Button>
-          </p>}
+      <Container className='LandingPage'>
 
-        {userStore.user && <div>
+        {userStore.user && <p className='welcome-back-row'>
           Welcome back, {userStore.user.displayName}
-          <button onClick={signOut}>Sign out</button>
-        </div>}
+          <Button onClick={userStore.signOut}>Sign out</Button>
+          {config.config.showEraseDB &&
+            <Button variant='danger' onClick={handleClickEraseDB}>Erase Database</Button>}
+        </p>}
 
         {!userStore.user &&
           <Link to={Routes.SIGN_IN}>Sign in</Link>}
 
+        {config.factory.renderLandingPageTitle()}
+        <br />
+
         {/* Join a room */}
-        <div>
-          <h1>Join a room</h1>
+        <h2>To join a room, enter code here:<br />
           <input
-            value={joinRoomCode}
-            placeholder='Enter room code'
-            onChange={handleChangeInputJoinRoom}></input>
-          <Link to={`room\${joinRoomCode}`}>Go</Link>
-          {/* <button onClick={handleClickJoin}>Join</button> */}
-        </div>
+            className={'input-room-code ' + (enteredJoinCode.length ? 'uppercase' : '')}
+            value={enteredJoinCode}
+            placeholder='Room code'
+            onChange={handleChangeInputJoinRoom}></input><br />
+          {joinCodeError && <span><FontAwesomeIcon icon={faExclamationTriangle} /> Room not found!</span>}
+          {joinCodeLink && <Link to={joinCodeLink}>Join room</Link>}
+          <br />
+        </h2>
 
         {/* Create a room */}
         {userStore.user && <>
-          <h1>Create room</h1>
-          <p>
+          <h2>
             {!roomStore.createdJoinCode &&
-
-              <button onClick={handleClickAddRoom}>Create Room</button>}
+              <Button onClick={handleClickAddRoom}>Create New Room</Button>}
             {roomStore.createdJoinCode &&
               <span>Created room code:
-              <label>{roomStore.createdJoinCode}</label>
-                <Link to={`${Routes.ROOM.replace(':id', roomStore.createdJoinCode)}`}>Go</Link>
-              </span>
-            }
-          </p>
+              <label className='new-room-code'>{roomStore.createdJoinCode}</label><br />
+                <Link to={`${Routes.ROOM.replace(':id', roomStore.createdJoinCode)}`}>Join room</Link>
+              </span>}
 
-          {/* <p>Rooms: {JSON.stringify(roomStore.rooms)}</p> */}
+          </h2>
         </>}
       </Container>
     </>
   );
 });
 
-
-export default withFirebaseAuth({
-  firebaseAppAuth,
-})(LandingPage);
+export default LandingPage;

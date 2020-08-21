@@ -8,6 +8,7 @@ import { Game } from '../models/game';
 import { Room } from '../models/room';
 import { Player } from '../models/player';
 import './Attendees.scss';
+import Button from 'react-bootstrap/Button';
 
 
 export interface AttendeesProps {
@@ -42,7 +43,7 @@ const Attendees = (props: AttendeesProps) => {
     <Card className='Attendees'>
       {props.currentUser && <div>
         Welcome back, {props.currentUser.displayName}
-        <button onClick={props.onClickSignOut}>Sign out</button>
+        <Button className='btn-sign-out' onClick={props.onClickSignOut}>Sign out</Button>
       </div>}
 
 

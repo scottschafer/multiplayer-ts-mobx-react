@@ -1,5 +1,5 @@
-import { firebaseApp } from './firebaseApp';
-import { WatchableModel } from '../models/watchableModel';
+import { firebaseApp } from '../firebase/firebaseApp';
+import { SynchronizedModel } from './synchronizedModel';
 import { observable, reaction, toJS } from 'mobx';
 import { MakeWritable } from '../utils/changeProperties';
 import { calculateUpdates } from '../utils/objectUtils';
@@ -14,7 +14,7 @@ export enum LoadingState {
 export type FirebaseCanceller = ((a: firebase.database.DataSnapshot | null, b?: string) => any) | undefined;
 
 
-export class ModelWatcher<T extends WatchableModel> {
+export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
 
   @observable readonly model: T;
   @observable readonly loadingState: LoadingState = LoadingState.NotLoaded;
@@ -71,12 +71,6 @@ export class ModelWatcher<T extends WatchableModel> {
       }
       if (value) {
         if (this.model) {
-          // if we received a version that matches what we sent, ignore it
-          // if (this.model.version === value.version
-          //   && this.model.lastUpdater === value.lastUpdater) {
-          //   return;
-          // }
-
           this.suspendReaction = true;
           const updatedData = {};
           calculateUpdates(toJS(this.model), value, updatedData);
@@ -92,7 +86,7 @@ export class ModelWatcher<T extends WatchableModel> {
           this.asWriteable.model = model;
         }
         this.asWriteable.loadingState = LoadingState.Loaded;
-        this.previousModel = value; // JSON.parse(JSON.stringify(toJS(this.model)));
+        this.previousModel = value;
         this.onLoaded && this.onLoaded();
       } else {
         this.asWriteable.loadingState = LoadingState.NotFound;
@@ -144,15 +138,6 @@ export class ModelWatcher<T extends WatchableModel> {
         (updates) => {
           if (Object.keys(updates).length) {
             console.log(`writing updates to ${this.dbPath}: ${JSON.stringify(updates, null, 2)}`);
-            // // if (this.suspendReaction) {
-            // //   console.log(`suspendReaction, ignoring`);
-            // //   return;
-            // // }
-
-            // if (this.previousModel) {
-            //   calculateUpdates(this.previousModel, model, this.updates);
-            // }
-            // this.previousModel = model;
             this.model.put(updates);
             this.asWriteable.updates = {};
             this.previousModel = JSON.parse(JSON.stringify(this.model));
@@ -161,6 +146,6 @@ export class ModelWatcher<T extends WatchableModel> {
   }
 
   private get asWriteable() {
-    return this as MakeWritable<ModelWatcher<T>>;
+    return this as MakeWritable<SyncrhonizedModelWatcher<T>>;
   }
 }

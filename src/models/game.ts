@@ -1,7 +1,7 @@
 import { Player, PlayerState } from './player';
 import { observable, action, computed } from "mobx";
 import { MakeOptional } from "../utils/changeProperties";
-import { WatchableModel } from './watchableModel';
+import { SynchronizedModel } from '../synchronization/synchronizedModel';
 
 export enum GameState {
   NotStarted,
@@ -9,7 +9,7 @@ export enum GameState {
   PlayAgain
 }
 
-export class Game extends WatchableModel {
+export class Game extends SynchronizedModel {
   @observable.ref playerPositions: Array<string> = [];
   @observable players: { [key: string]: Player } = {};
   @observable previousPlayerId: string = '';

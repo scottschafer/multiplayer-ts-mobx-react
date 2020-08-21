@@ -1,12 +1,12 @@
 import { RootStore } from './rootStore';
 import { Chat } from '../models/chat';
-import { ModelWatcher } from '../firebase/modelWatcher';
+import { SyncrhonizedModelWatcher } from '../synchronization/syncrhonizedModelWatcher';
 import { computed } from 'mobx';
 
 export class ChatStore {
 
   // Automatically load and save the room (magic!)
-  private readonly chatModelWatcher = new ModelWatcher<Chat>(Chat, 'chats');
+  private readonly chatModelWatcher = new SyncrhonizedModelWatcher<Chat>(Chat, 'chats');
 
 
   @computed get currentChat() {

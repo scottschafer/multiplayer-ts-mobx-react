@@ -7,12 +7,13 @@ interface GameConfig {
   factory: {
     gameFactory: typeof Game; // model
     renderGame: () => JSX.Element; // view
+    renderLandingPageTitle: () => JSX.Element,
   },
   config: {
     showEraseDB: boolean;
   },
   authentication: {
-    renderTitle: () => JSX.Element,
+    renderSignInTitle: () => JSX.Element,
     allowEmailSignIn?: boolean,
     allowGoogleSignIn?: boolean,
     allowFacebookSignIn?: boolean,
@@ -22,17 +23,23 @@ interface GameConfig {
   }
 }
 
-export const GlobalGameConfig: GameConfig = {
-  factory: {
-    gameFactory: SuperGhostGame,
-    renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>
-  },
-  config: {
-    showEraseDB: true,
-  },
-  authentication: {
-    renderTitle: () => <h1>Sign in to play Superghost!</h1>,
-    allowEmailSignIn: false,
-    allowGoogleSignIn: true
-  }
-}
+export const getConfig = () => {
+  const config: GameConfig = {
+    factory: {
+      gameFactory: SuperGhostGame,
+      renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>,
+      renderLandingPageTitle: () => <h1>Superghost!</h1>,
+    },
+    config: {
+      showEraseDB: true,
+    },
+    authentication: {
+      renderSignInTitle: () => <h1>Sign in to play Superghost!</h1>,
+      allowEmailSignIn: false,
+      allowGoogleSignIn: true
+    }
+  };
+  return config;
+};
+
+// GlobalGameConfig.factory.renderLandingPageTitle = () => <SuperGhostGamePage></SuperGhostGamePage>;

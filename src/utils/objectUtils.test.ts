@@ -5,11 +5,22 @@ test('assignObject', () => {
   const srcObject = {
     a: 1,
     b: 'string',
-    c: [1, 2, 3]
+    c: [1, 2, 3],
+    d: {
+      e: 1,
+      f: 2
+    }
   };
   const dstObject = {};
   assignObject(dstObject, srcObject);
-  expect(JSON.stringify(srcObject)).toEqual(JSON.stringify(dstObject));
+
+  expect(srcObject).toMatchObject(dstObject);
+
+  const updatedObject = JSON.parse(JSON.stringify(srcObject));
+  delete updatedObject.d;
+  updatedObject.b = 'something else';
+  assignObject(dstObject, updatedObject);
+  expect(dstObject).toMatchObject(updatedObject);
 });
 
 test('calculateUpdates', () => {
@@ -19,7 +30,10 @@ test('calculateUpdates', () => {
       { a: 1, b: 2 }
     )
   ).toMatchObject(
-    { b: 2, c: null }
+    {
+      '/b': 2,
+      '/c': null
+    }
   );
 
   expect(calculateUpdates
@@ -28,7 +42,7 @@ test('calculateUpdates', () => {
       { a: 1, b: 2 }
     )
   ).toMatchObject(
-    { c: null }
+    { '/c': null }
   );
 
   expect(calculateUpdates
@@ -37,7 +51,8 @@ test('calculateUpdates', () => {
       { a: { b: { c: 2 } }, d: { e: 4 } }
     )
   ).toMatchObject(
-    { 'a/b/c': 2 }
+    { '/a/b/c': 2 }
   );
+
 
 })

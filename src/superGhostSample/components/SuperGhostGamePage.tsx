@@ -106,7 +106,7 @@ const SuperGhostRunningGame = observer((props: {
   const [startLetter, setStartLetter] = useState('');
   const [endLetter, setEndLetter] = useState('');
   const [challengeText, setChallengeText] = useState('');
-  const { currentFragment: currentWord, superGhost, currentPlayer } = currentGame;
+  const { currentFragment: currentWord, superGhost } = currentGame;
 
   if (challengeText && !currentGame.challengeInProgress) {
     setChallengeText('');

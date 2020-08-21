@@ -1,10 +1,10 @@
 import { observable, computed, action } from 'mobx';
 import { MakeOptional, MakeWritable } from "../utils/changeProperties";
-import { WatchableModel } from './watchableModel';
+import { SynchronizedModel } from '../synchronization/synchronizedModel';
 import { Player } from './player';
 import { firebaseApp } from '../firebase/firebaseApp';
 
-export class Room extends WatchableModel {
+export class Room extends SynchronizedModel {
   readonly name: string = '';;
   readonly joinCode: string = '';
   readonly gameKey: string = '';
@@ -109,7 +109,10 @@ export class Room extends WatchableModel {
 
   private sortUsers(users: Array<Player>) {
     // first sort by name
-    users.sort((a, b) => (a.displayName.localeCompare(b.displayName)));
+    users.sort((a, b) => {
+      return (a.displayName || a.playerName).localeCompare((b.displayName || b.playerName));
+    });
+
     // now put hosts first
     users.sort((a, b) => {
       const aIsHost = this.hostIds.includes(a.uid) ? 0 : 1;

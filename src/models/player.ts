@@ -1,5 +1,5 @@
 import { MakeOptional } from "../utils/changeProperties";
-import { observable } from "mobx";
+import { observable, toJS } from "mobx";
 
 export enum PlayerType {
   Human,
@@ -26,9 +26,11 @@ export class Player {
     const newVals: MakeOptional<Player> = {};
 
     if (src) {
-      Object.keys(this).forEach(key => {
-        if (typeof this[key] !== 'function' && src[key]) {
-          newVals[key] = src[key];
+      const objThis = toJS(this);
+      const objSrc = toJS(src);
+      Object.keys(objThis).forEach(key => {
+        if (typeof objThis[key] !== 'function' && objSrc[key]) {
+          newVals[key] = objSrc[key];
         }
       });
     }

@@ -1,5 +1,5 @@
 import { action, computed, observable, reaction, toJS } from 'mobx';
-import { ModelWatcher, LoadingState } from '../firebase/modelWatcher';
+import { SyncrhonizedModelWatcher, LoadingState } from '../synchronization/syncrhonizedModelWatcher';
 import { firebaseApp } from '../firebase/firebaseApp';
 import { Chat } from '../models/chat';
 import { JoinCode } from '../models/joinCode';
@@ -14,12 +14,16 @@ import { RootStore } from './rootStore';
 
 export class RoomStore {
 
+  @observable readonly enteredJoinCode: string = '';
+  @observable readonly joinCodeError: boolean = false;
+  @observable readonly joinCodeLink: string = '';
+
   @observable readonly createdJoinCode: string = '';
   @observable readonly currentJoinCode: string = '';
   @observable readonly localRoom: Room = null;
 
   // Automatically load and save the room (magic!)
-  private readonly roomModelWatcher = new ModelWatcher<Room>(Room, 'rooms' /*, this.handleRoomLoaded */);
+  private readonly roomModelWatcher = new SyncrhonizedModelWatcher<Room>(Room, 'rooms' /*, this.handleRoomLoaded */);
 
   @computed get currentUserIsRoomHost() {
     const { currentRoom } = this;
@@ -45,6 +49,10 @@ export class RoomStore {
       return LoadingState.Loaded;
     }
     return this.roomModelWatcher.loadingState;
+  }
+
+  @action.bound setEnteredRoomCode(code: string) {
+    this.asWriteable.enteredJoinCode = code;
   }
 
   @action.bound handleLeaveRoomPage() {
@@ -149,6 +157,31 @@ export class RoomStore {
           currentRoom.addUser(new Player(user));
         }
       }, { delay: 100 });
+
+    // react to the user entering a join code 
+    reaction(() => ({
+      enteredJoinCode: this.enteredJoinCode
+    }),
+      ({ enteredJoinCode }) => {
+        this.asWriteable.joinCodeError = false;
+        this.asWriteable.joinCodeLink = '';
+
+        if (enteredJoinCode.length >= 3) {
+          const database = firebaseApp.database();
+
+          database.ref(`joinCodes/${enteredJoinCode.toLowerCase()}`).once('value', (snapshot) => {
+            const val = snapshot.val();
+            if (!val) {
+              this.asWriteable.joinCodeError = true;
+            } else {
+              this.asWriteable.joinCodeLink = `room/${enteredJoinCode}`;
+            }
+          },
+            (error) => {
+              this.asWriteable.joinCodeError = true;
+            });
+        }
+      });
   }
 
   @action async createNewRoom() {
@@ -195,8 +228,7 @@ export class RoomStore {
       code: joinCode,
       roomKey: room.key
     });
-
-    database.ref('joinCodes').push(toMinifiedObject(joinCodeObj));
+    database.ref('joinCodes').child(joinCode).set(toMinifiedObject(joinCodeObj));
   }
 
   private get asWriteable() {

@@ -1,15 +1,15 @@
 import { computed, reaction, action, toJS } from 'mobx';
-import { ModelWatcher, LoadingState } from '../firebase/modelWatcher';
+import { SyncrhonizedModelWatcher, LoadingState } from '../synchronization/syncrhonizedModelWatcher';
 import { Game } from '../models/game';
 import { MakeOptional, MakeWritable } from '../utils/changeProperties';
 import { RootStore } from './rootStore';
 import { Player, PlayerState } from '../models/player';
-import { GlobalGameConfig } from '../GameConfig';
+// import { GlobalGameConfig } from '../GameConfig';
 
 export class GameStore {
 
   // Automatically load and save the game (magic!)
-  private readonly gameModelWatcher = new ModelWatcher<Game>(GlobalGameConfig.factory.gameFactory, 'games');
+  private readonly gameModelWatcher = new SyncrhonizedModelWatcher<Game>(this.rootStore.config.factory.gameFactory, 'games');
   private localGame: Game = null;
 
   @computed get currentGame() {
@@ -96,7 +96,7 @@ export class GameStore {
   }
 
   createGame(params?: MakeOptional<Game>) {
-    return new GlobalGameConfig.factory.gameFactory(params);
+    return new this.rootStore.config.factory.gameFactory(params);
   }
 
   private get asWriteable() {

@@ -7,30 +7,30 @@ import Row from 'react-bootstrap/Row';
 import { Link, Prompt, useParams } from 'react-router-dom';
 import Attendees from '../components/Attendees';
 import { Routes } from '../constants/routes';
-import { LoadingState } from '../firebase/modelWatcher';
-import { GlobalGameConfig } from '../GameConfig';
+// import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
-import withFirebaseAuth, { WrappedComponentProps } from 'react-with-firebase-auth';
-import { firebaseAppAuth } from '../firebase/firebaseApp';
+import { LoadingState } from '../synchronization/syncrhonizedModelWatcher';
 import SignInPage from './SignInPage';
 
 
-const RoomPage = observer(({ user, signOut }: WrappedComponentProps) => {
+const RoomPage = observer(() => {
 
-  const { userStore, roomStore, gameStore } = useStores();
+  const { config, userStore, roomStore, gameStore } = useStores();
   const params = useParams<{ id: string }>();
+
+  const { user } = userStore;
 
   const currentRoom = roomStore.currentRoom;
   const currentGame = gameStore.currentGame;
   roomStore.setCurrentJoinCode(params.id);
 
-
-
   return (
     <Container fluid>
 
-      {!user && <>
-        <SignInPage></SignInPage>
+      {!user && !userStore.waitingToAuthenticate && <>
+        <Container>
+          <SignInPage></SignInPage>
+        </Container>
       </>}
 
       {user && <>
@@ -52,7 +52,7 @@ const RoomPage = observer(({ user, signOut }: WrappedComponentProps) => {
         {(roomStore.loadingState === LoadingState.Loaded && currentRoom) &&
           <Row>
             <Col>
-              {currentGame && GlobalGameConfig.factory.renderGame()}
+              {currentGame && config.factory.renderGame()}
             </Col>
             {currentGame?.showAttendeeList &&
               <Col xs="auto">
@@ -60,7 +60,7 @@ const RoomPage = observer(({ user, signOut }: WrappedComponentProps) => {
                   room={currentRoom}
                   game={currentGame}
                   currentUser={userStore.user}
-                  onClickSignOut={signOut}
+                  onClickSignOut={userStore.signOut}
                   onClickJoinGame={gameStore.joinGame}
                   onClickLeaveGame={gameStore.leaveGame}
                   onClickAdmitUser={roomStore.admitUser}
@@ -76,7 +76,4 @@ const RoomPage = observer(({ user, signOut }: WrappedComponentProps) => {
   );
 });
 
-
-export default withFirebaseAuth({
-  firebaseAppAuth,
-})(RoomPage);
+export default RoomPage;

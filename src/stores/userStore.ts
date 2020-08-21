@@ -3,11 +3,13 @@ import { RootStore } from './rootStore';
 import { firebaseApp } from '../firebase/firebaseApp';
 
 export class UserStore {
+  @observable waitingToAuthenticate: boolean = true;
   @observable user: firebase.User;
 
   constructor(public readonly rootStore: RootStore) {
     firebaseApp.auth().onAuthStateChanged((user) => {
       this.setUser(user);
+      this.waitingToAuthenticate = false;
     });
 
     if (window.location.search) {
@@ -28,5 +30,9 @@ export class UserStore {
     if (user) {
       console.log(`logged in user, uid=${user.uid}, displayName=${user.displayName}`);
     }
+  }
+
+  @action.bound signOut() {
+    firebaseApp.auth().signOut();
   }
 }

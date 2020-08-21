@@ -1,4 +1,4 @@
 export const Constants = {
-  MaxSecondsPerTurn: 300,
+  MaxSecondsPerTurn: 30,
   MinLettersForSpellCheck: 4
 };

@@ -25,6 +25,7 @@ const testUsers = [
 
 function getPlayerListProps(
   handlers?: {
+    onClickSignOut: () => void,
     onClickJoinGame: ((user: Player) => void);
     onClickLeaveGame: ((user: Player) => void);
 
@@ -37,11 +38,13 @@ function getPlayerListProps(
 ): AttendeesProps {
   const game = new Game();
   const currentUser: firebase.User = testUsers[0] as any as firebase.User;
-  const room = new Room({
-    usersInRoom: testUsers
+  const room = new Room();
+  testUsers.forEach(user => {
+    room.addUser(user);
   });
 
   const {
+    onClickSignOut,
     onClickJoinGame,
     onClickLeaveGame,
     onClickAdmitUser,
@@ -54,6 +57,7 @@ function getPlayerListProps(
     room,
     game,
     currentUser,
+    onClickSignOut,
     onClickJoinGame,
     onClickLeaveGame,
     onClickAdmitUser,
