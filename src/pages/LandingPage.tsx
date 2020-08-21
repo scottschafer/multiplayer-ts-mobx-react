@@ -8,7 +8,6 @@ import Container from 'react-bootstrap/Container';
 import { Link } from 'react-router-dom';
 import { Routes } from '../constants/routes';
 import { firebaseApp } from '../firebase/firebaseApp';
-// import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
 import './LandingPage.scss';
 

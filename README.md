@@ -10,6 +10,8 @@ And it's also a platform for creating multiplayer games in the cloud without muc
 
 ## Model persistence and synchronization
 
+Important data objects, such as the current room and game, are automatically synchronized with the firebase database. When you write to them, your changes are saved. Other instances of the application that are using those models will receive those updates
+
 Using a `SynchronizedModel` subclass and `SynchronizedModelRunner`, any changes made to the model's `@observable` fields (including any nested objects) will be automatically written to a Firebase database. If an instance of the application on a different machine changes that object, those changes will be automatically received and applied to the model as well.
 
 This mechanism is efficient. If you change only one field of a nested object, only that field will be updated in the DB.
