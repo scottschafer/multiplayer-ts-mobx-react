@@ -1,5 +1,5 @@
 import { action, computed, observable, reaction, toJS } from 'mobx';
-import { SyncrhonizedModelWatcher, LoadingState } from '../synchronization/syncrhonizedModelWatcher';
+import { SynchronizedModelRunner, LoadingState } from '../synchronization/synchronizedModelRunner';
 import { firebaseApp } from '../firebase/firebaseApp';
 import { Chat } from '../models/chat';
 import { JoinCode } from '../models/joinCode';
@@ -23,7 +23,7 @@ export class RoomStore {
   @observable readonly localRoom: Room = null;
 
   // Automatically load and save the room (magic!)
-  private readonly roomModelWatcher = new SyncrhonizedModelWatcher<Room>(Room, 'rooms' /*, this.handleRoomLoaded */);
+  private readonly roomModelRunner = new SynchronizedModelRunner<Room>(Room, 'rooms');
 
   @computed get currentUserIsRoomHost() {
     const { currentRoom } = this;
@@ -41,14 +41,14 @@ export class RoomStore {
     if (this.localRoom) {
       return this.localRoom;
     }
-    return this.roomModelWatcher.model;
+    return this.roomModelRunner.model;
   }
 
   @computed get loadingState() {
     if (this.localRoom) {
       return LoadingState.Loaded;
     }
-    return this.roomModelWatcher.loadingState;
+    return this.roomModelRunner.loadingState;
   }
 
   @action.bound setEnteredRoomCode(code: string) {
@@ -136,7 +136,7 @@ export class RoomStore {
       const joinCodes = await this.getJoinCodes();
 
       const joinCode = joinCodes.find(joinCode => (joinCode.code === id));
-      this.roomModelWatcher.key = joinCode?.roomKey || null;
+      this.roomModelRunner.key = joinCode?.roomKey || null;
     }
   }
 

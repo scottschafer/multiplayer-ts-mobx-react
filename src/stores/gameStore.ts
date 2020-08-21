@@ -1,5 +1,5 @@
 import { computed, reaction, action, toJS } from 'mobx';
-import { SyncrhonizedModelWatcher, LoadingState } from '../synchronization/syncrhonizedModelWatcher';
+import { SynchronizedModelRunner, LoadingState } from '../synchronization/synchronizedModelRunner';
 import { Game } from '../models/game';
 import { MakeOptional, MakeWritable } from '../utils/changeProperties';
 import { RootStore } from './rootStore';
@@ -9,21 +9,21 @@ import { Player, PlayerState } from '../models/player';
 export class GameStore {
 
   // Automatically load and save the game (magic!)
-  private readonly gameModelWatcher = new SyncrhonizedModelWatcher<Game>(this.rootStore.config.factory.gameFactory, 'games');
+  private readonly gameModelRunner = new SynchronizedModelRunner<Game>(this.rootStore.config.factory.gameModelFactory, 'games');
   private localGame: Game = null;
 
   @computed get currentGame() {
     if (this.localGame) {
       return this.localGame;
     }
-    return this.gameModelWatcher.model;
+    return this.gameModelRunner.model;
   }
 
   @computed get loadingState() {
     if (this.localGame) {
       return LoadingState.Loaded;
     }
-    return this.gameModelWatcher.loadingState;
+    return this.gameModelRunner.loadingState;
   }
 
   @action.bound joinGame(player: Player) {
@@ -72,7 +72,7 @@ export class GameStore {
     reaction(() => this.rootStore.roomStore.currentRoom,
       currentRoom => {
         if (currentRoom) {
-          this.gameModelWatcher.key = currentRoom.gameKey;
+          this.gameModelRunner.key = currentRoom.gameKey;
         }
       });
 
@@ -96,7 +96,7 @@ export class GameStore {
   }
 
   createGame(params?: MakeOptional<Game>) {
-    return new this.rootStore.config.factory.gameFactory(params);
+    return new this.rootStore.config.factory.gameModelFactory(params);
   }
 
   private get asWriteable() {

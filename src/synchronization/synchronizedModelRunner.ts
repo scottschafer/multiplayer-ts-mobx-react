@@ -3,6 +3,11 @@ import { SynchronizedModel } from './synchronizedModel';
 import { observable, reaction, toJS } from 'mobx';
 import { MakeWritable } from '../utils/changeProperties';
 import { calculateUpdates } from '../utils/objectUtils';
+import { getConfig } from '../GameConfig';
+
+function isVerbose() {
+  return getConfig().development.verbose;
+}
 
 export enum LoadingState {
   NotLoaded,
@@ -12,9 +17,7 @@ export enum LoadingState {
 };
 
 export type FirebaseCanceller = ((a: firebase.database.DataSnapshot | null, b?: string) => any) | undefined;
-
-
-export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
+export class SynchronizedModelRunner<T extends SynchronizedModel> {
 
   @observable readonly model: T;
   @observable readonly loadingState: LoadingState = LoadingState.NotLoaded;
@@ -59,7 +62,7 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
     }
     const ref = `${this.dbPath}/${key}`;
 
-    console.log(`watching for ${ref}`);
+    isVerbose() && console.log(`watching for ${ref}`);
     this.asWriteable.loadingState = LoadingState.Loading;
     this.stopReaction();
     this.asWriteable.model = null;
@@ -72,10 +75,11 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
       if (value) {
         if (this.model) {
           this.suspendReaction = true;
-          const updatedData = {};
-          calculateUpdates(toJS(this.model), value, updatedData);
-          console.log(`Firebase: Received new data for ${this.dbPath}: ${JSON.stringify(updatedData)}`);
-
+          if (isVerbose()) {
+            const updatedData = {};
+            calculateUpdates(toJS(this.model), value, updatedData);
+            console.log(`Firebase: Received new data for ${this.dbPath}: ${JSON.stringify(updatedData)}`);
+          }
           this.model.assign(value);
           this.suspendReaction = false;
 
@@ -115,7 +119,7 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
   }
 
   private startReaction() {
-    console.log(`startReaction on ${this.dbPath}`);
+    isVerbose() && console.log(`startReaction on ${this.dbPath}`);
     this.cancelModelChangeReaction =
       reaction(() => toJS(this.model),
         (model) => {
@@ -127,7 +131,7 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
           if (this.previousModel) {
             // console.log(`reaction triggered on ${this.dbPath}`);
             calculateUpdates(this.previousModel, model, this.updates);
-            if (Object.keys(this.updates)) {
+            if (isVerbose() && Object.keys(this.updates)) {
               console.log(`detected updates to memory model ${this.dbPath}: ${JSON.stringify(this.updates, null, 2)}`);
             }
           }
@@ -137,7 +141,7 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
       reaction(() => toJS(this.updates),
         (updates) => {
           if (Object.keys(updates).length) {
-            console.log(`writing updates to ${this.dbPath}: ${JSON.stringify(updates, null, 2)}`);
+            isVerbose() && console.log(`writing updates to ${this.dbPath}: ${JSON.stringify(updates, null, 2)}`);
             this.model.put(updates);
             this.asWriteable.updates = {};
             this.previousModel = JSON.parse(JSON.stringify(this.model));
@@ -146,6 +150,6 @@ export class SyncrhonizedModelWatcher<T extends SynchronizedModel> {
   }
 
   private get asWriteable() {
-    return this as MakeWritable<SyncrhonizedModelWatcher<T>>;
+    return this as MakeWritable<SynchronizedModelRunner<T>>;
   }
 }

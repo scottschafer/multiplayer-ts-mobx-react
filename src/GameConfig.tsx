@@ -5,7 +5,7 @@ import SuperGhostGamePage from './superGhostSample/components/SuperGhostGamePage
 
 interface GameConfig {
   factory: {
-    gameFactory: typeof Game; // model
+    gameModelFactory: typeof Game; // model
     renderGame: () => JSX.Element; // view
     renderLandingPageTitle: () => JSX.Element,
   },
@@ -20,24 +20,34 @@ interface GameConfig {
     allowTwitterSignIn?: boolean,
     allowGithubSignIn?: boolean,
     allowAnonymousSignIn?: boolean,
+  },
+  development: {
+    verbose: boolean,
+    breakOnErrors: Boolean
   }
 }
 
-export const getConfig = () => {
-  const config: GameConfig = {
-    factory: {
-      gameFactory: SuperGhostGame,
-      renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>,
-      renderLandingPageTitle: () => <h1>Superghost!</h1>,
-    },
-    config: {
-      showEraseDB: (window.origin.includes('http://localhost')),
-    },
-    authentication: {
-      renderSignInTitle: () => <h1>Sign in to play Superghost!</h1>,
-      allowEmailSignIn: false,
-      allowGoogleSignIn: true
-    }
-  };
-  return config;
+const config: GameConfig = {
+  factory: {
+    // override to supply your game model class:
+    gameModelFactory: SuperGhostGame,
+    // override to render your view:
+    renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>,
+    renderLandingPageTitle: () => <h1>Superghost!</h1>,
+  },
+  config: {
+    // Only show the "Erase DB" button when on localhost. This is useful for development. It blows away all data.
+    showEraseDB: (window.origin.includes('http://localhost')),
+  },
+  authentication: {
+    renderSignInTitle: () => <h1>Sign in to play Superghost!</h1>,
+    allowEmailSignIn: false,
+    allowGoogleSignIn: true
+  },
+  development: {
+    verbose: true,
+    breakOnErrors: true
+  }
 };
+
+export const getConfig: (() => GameConfig) = () => { return config; };

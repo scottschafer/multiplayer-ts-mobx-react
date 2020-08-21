@@ -9,7 +9,7 @@ import Attendees from '../components/Attendees';
 import { Routes } from '../constants/routes';
 // import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
-import { LoadingState } from '../synchronization/syncrhonizedModelWatcher';
+import { LoadingState } from '../synchronization/synchronizedModelRunner';
 import SignInPage from './SignInPage';
 
 

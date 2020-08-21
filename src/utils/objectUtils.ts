@@ -1,6 +1,13 @@
 import { toJS } from "mobx";
+import { getConfig } from '../GameConfig';
 
-let verbose = false;
+function isVerbose() {
+  return getConfig().development.verbose;
+}
+
+function shouldBreakOnErrors() {
+  return getConfig().development.breakOnErrors;
+}
 
 function simplifyValue(val: any, preventCircular: Set<Object> = null, depth = 0): any {
   if (!val || typeof val === 'string' || typeof val === 'number') {
@@ -46,7 +53,6 @@ export function toMinifiedObject(obj: object): object {
 export function assignObject(target: object, src: object, path: string = '/') {
 
   const srcKeys = Object.keys(src);
-  // if (path !== '/') {
   const dstKeys = Object.keys(target);
   const dstKeysSet = new Set<string>(dstKeys);
   dstKeysSet.forEach(dstKey => {
@@ -60,23 +66,23 @@ export function assignObject(target: object, src: object, path: string = '/') {
             delete targetFieldVal[targetChildKey];
           });
         }
-      } else {
-        delete target[dstKey];
       }
 
-      verbose && console.log(`assignObject: deleting ${path + dstKey}`);
+      isVerbose() && console.log(`assignObject: deleting ${path + dstKey}`);
     }
   });
-  // }
+
   srcKeys.forEach(key => {
     const srcVal = src[key];
     if (srcVal === undefined || srcVal === null) {
-      verbose && console.log(`assignObject: deleting ${path + key}`);
-      delete target[key];
-      debugger;
+      isVerbose() && console.log(`assignObject: ${path + key} is null or undefined. This is probably a bug`);
+      if (shouldBreakOnErrors()) {
+        debugger;
+      }
+      //delete target[key];
     } else if (typeof srcVal === 'object') {
       if (Array.isArray(srcVal)) {
-        verbose && console.log(`assignObject: assigning array ${path + key}`);
+        isVerbose() && console.log(`assignObject: assigning array ${path + key}`);
         target[key] = srcVal;
       } else {
         if (!target[key]) {
@@ -85,7 +91,7 @@ export function assignObject(target: object, src: object, path: string = '/') {
         assignObject(target[key], srcVal, path + key + '/');
       }
     } else {
-      verbose && console.log(`assignObject: assigning ${path + key} the value of ${srcVal}`);
+      isVerbose() && console.log(`assignObject: assigning ${path + key} the value of ${srcVal}`);
       target[key] = srcVal;
     }
   });
@@ -94,7 +100,9 @@ export function assignObject(target: object, src: object, path: string = '/') {
 
 export function calculateUpdates(oldVal: object, newVal: object, target: object = null, path: string = '/'): object {
   if (newVal === null) {
-    debugger;
+    if (shouldBreakOnErrors()) {
+      debugger;
+    }
     console.error(`Error in model: ${path} cannot be null`);
     return;
   }
