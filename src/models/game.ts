@@ -78,11 +78,11 @@ export class Game extends SynchronizedModel {
   @action removePlayer(player: Player) {
     if (this.players[player.playerId]) {
       delete this.players[player.playerId];
-      this.playerPositions = this.playerPositions.filter(id => (player.playerId !== id));
     }
+    this.playerPositions = this.playerPositions.filter(id => (player.playerId !== id));
   }
 
-  get canStartGame() {
+  @computed get canStartGame() {
     return this.playerPositions.length >= 2;
   }
 

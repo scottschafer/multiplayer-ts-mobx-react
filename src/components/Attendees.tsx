@@ -86,7 +86,7 @@ const Attendees = (props: AttendeesProps) => {
         {
           !!usersAdmitted.length &&
           <>
-            <Card.Header>In room</Card.Header>
+            <Card.Header>Users in room</Card.Header>
             <ListGroup as="ul">
               {usersAdmitted.map(player =>
                 <AttendeeListItem
@@ -103,7 +103,7 @@ const Attendees = (props: AttendeesProps) => {
         {
           !!usersBlocked.length &&
           <>
-            <Card.Header>Blocked</Card.Header>
+            <Card.Header>Blocked users</Card.Header>
             <ListGroup as="ul">
               {usersBlocked.map(player =>
                 <AttendeeListItem

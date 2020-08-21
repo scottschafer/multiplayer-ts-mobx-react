@@ -1,6 +1,6 @@
 import { computed, reaction, action, toJS } from 'mobx';
 import { SynchronizedModelRunner, LoadingState } from '../synchronization/synchronizedModelRunner';
-import { Game } from '../models/game';
+import { Game, GameState } from '../models/game';
 import { MakeOptional, MakeWritable } from '../utils/changeProperties';
 import { RootStore } from './rootStore';
 import { Player, PlayerState } from '../models/player';
@@ -93,6 +93,17 @@ export class GameStore {
         }
       },
       { delay: 100 });
+
+    // if the game can't be started
+    reaction(() => ({
+      canStartGame: this.currentGame?.canStartGame
+    }), ({ canStartGame }) => {
+      if (!canStartGame) {
+        if (this.currentGame?.gameState === GameState.PlayAgain) {
+          this.currentGame.gameState = GameState.NotStarted;
+        }
+      }
+    });
   }
 
   createGame(params?: MakeOptional<Game>) {

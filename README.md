@@ -8,7 +8,19 @@ It's also a demonstration of a serverless technology stack that uses Mobx, React
 
 And it's also a platform for creating multiplayer games in the cloud without much effort.
 
-## Model persistence and synchronization
+## Developing your own games
+
+Superghost is cool and all, but the cooler thing to do is develop your own game. It's designed to be pretty simple. First, subclass a `Game` model to contain your data. Create a React component to render your view (make it an `observer`). Then link up your model and view factories in `src/GameConfig.tsx`. Boom, you have a multiplayer game in the cloud.
+
+While the demo is turn based, there's no real reason the gameplay couldn't be simultaneous.
+
+## Rooms, Room Codes, Users, Players and Games
+
+A room has a host, admitted users, and is linked to a game. Rooms have associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects. A room and its associated game will be loaded when the user navigates to `/room/:joinCode`.
+
+A user is an authenticated Firebase user, with a user id (`uid`). A player always has an associated user, but there may be multiple players with the same uid if they are playing under the same account. That is, I could join a game on my computer and add two players - one for myself and one for my son. Then I could challenge my brother, who would add two players: himself and his daughter.
+
+## Model persistence and synchronization: how it works under the hood
 
 Important data objects, such as the current room and game, are automatically synchronized with the firebase database. When you write to them, your changes are saved. If an instance of the application on another machine updates a model, the changes are synchronized to the model. Provided your fields are `@observable`, components that are `observer` will automatically render the updates.
 
@@ -22,20 +34,6 @@ To start the database connection, create the `SynchronizedModelRunner` like so:
 ```
 
 This won't start synchronization until you set its key (example: `roomModelRunner.key = '123'`). Once that has been set, it will automatically read and write `roomModelRunner.model` to the database whenever changes are made. Magic!
-
-## Rooms, Room Codes, Users, Players and Games
-
-A room is similar to what you have in Zoom. It has a host, and users can join a room by going to a URL and waiting to be admitted. Rooms have associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects.
-
-Each room will be linked to a game.
-
-A user is an authenticated Firebase user, with a user id (`uid`). There may be more than one player with the same user id when multiple players are using the same browser window. That is, I could join a game on my computer and add two players - one for myself and one for my son. Then I could challenge my brother, who would add two players: himself and his daughter.
-
-## Developing your own games
-
-Superghost is cool and all, but the cooler thing to do is develop your own game. It's designed to be pretty simple. First, subclass a `Game` model to contain your data. Create a React component to render your view (make it an `observer`). Then link up your model and view factories in `src/GameConfig.tsx`. Boom, you have a multiplayer game in the cloud.
-
-While the demo is turn based, there's no real reason the gameplay couldn't be simultaneous.
 
 ## TODO:
 

@@ -44,8 +44,10 @@ const SuperGhostGamePage = () => {
           {currentGame.canStartGame && roomStore.currentUserIsRoomHost &&
             <Button onClick={handleClickStartGame}>Start Game</Button>
           }
-          {!currentGame.canStartGame &&
+          {!currentGame.canStartGame && <>
             <h1>Waiting for more players...</h1>
+            <h3><i>Click "Join" to add another player who will play on this device.</i></h3>
+            </>
           }
         </>}
 
@@ -87,13 +89,11 @@ const SuperGhostGamePage = () => {
 const SuperGhostInstructions = () => (
   <>
     <h1>Superghost</h1>
-    <h3>
       <p>Take turns adding a letter to the beginning <b>or</b> end of a word fragment - just as long as you don't make a valid word
       that's longer than three letters.</p>
 
       <p>It's your turn and you can't think of any word that includes the fragment? Challenge your opponents! If any can come up with
         a valid word containing that fragment, you will lose, but if they can't - you win!</p>
-    </h3>
   </>
 );
 
@@ -158,7 +158,7 @@ const SuperGhostRunningGame = observer((props: {
   };
 
   return (
-    <>
+    <div className='playing'>
       <TimeOutBar
         running={true}
         currentTime={currentTime.get()}
@@ -244,7 +244,7 @@ const SuperGhostRunningGame = observer((props: {
         )}
       </ListGroup>
 
-    </>
+    </div>
   )
 });
 
