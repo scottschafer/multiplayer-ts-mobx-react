@@ -25,7 +25,7 @@ This won't start synchronization until you set its key (example: `roomModelRunne
 
 ## Rooms, Room Codes, Users, Players and Games
 
-A room is similar to what you have in Zoom. It has a host, and users can join a room by going to a URL and waiting to be admitted. Rooms have ~~~~associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects.
+A room is similar to what you have in Zoom. It has a host, and users can join a room by going to a URL and waiting to be admitted. Rooms have associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects.
 
 Each room will be linked to a game.
 
