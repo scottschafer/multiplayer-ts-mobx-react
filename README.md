@@ -2,28 +2,29 @@
 
 Demo: [https://multiplayer-game-f788f.web.app](https://multiplayer-game-f788f.web.app)
 
-While this might appear to be a web implementation of the game "Superghost" (aka [Lexicant](https://en.wikipedia.org/wiki/Lexicant), in which the game to be played in real time by multiple players on different and/or shared computers, it aims to be something more.
+While this might appear to be a web-based implementation of the game "Superghost" (aka [Lexicant](https://en.wikipedia.org/wiki/Lexicant)), it aims to be something more.
 
 It's also a demonstration of a serverless technology stack that uses Mobx, React and Firebase to implement Zoom-like room functionality and painless data persistence and synchronization.
 
- But it's also a platform for creating multiplayer games in the cloud without much effort.
+And it's also a platform for creating multiplayer games in the cloud without much effort.
 
 ## Model persistence and synchronization
 
-Using a `SynchronizedModel` subclass and `SynchronizedModelRunner`, any changes made to the model's `@observable` fields (including any nested objects) will be automatically written to a Firebase database. If an instance of the application on a different machine changes that object, those changes will be automatically received and applied.
+Using a `SynchronizedModel` subclass and `SynchronizedModelRunner`, any changes made to the model's `@observable` fields (including any nested objects) will be automatically written to a Firebase database. If an instance of the application on a different machine changes that object, those changes will be automatically received and applied to the model as well.
 
-The delta calculation is fairly intelligent. If you change only one field of a nested object, only that field will be updated.
+This mechanism is efficient. If you change only one field of a nested object, only that field will be updated in the DB.
 
 To start the database connection, create the `SynchronizedModelRunner` like so:
+
 ```
   private readonly roomModelRunner = new SynchronizedModelRunner<Room>(Room, 'rooms');
 ```
-This won't start synchronization until you set its key (example: `roomModelRunner.key = '123'`). Once that has been set, it will automatically read and write `roomModelRunner.model` to the database whenever changes are made. It's magic.
+
+This won't start synchronization until you set its key (example: `roomModelRunner.key = '123'`). Once that has been set, it will automatically read and write `roomModelRunner.model` to the database whenever changes are made. Magic!
 
 ## Rooms, Room Codes, Users, Players and Games
 
-A room is similar to what you have in Zoom. It has a host, and users can join a room by going to a URL and waiting to be admitted. Rooms have
-associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects.
+A room is similar to what you have in Zoom. It has a host, and users can join a room by going to a URL and waiting to be admitted. Rooms have ~~~~associated short codes (`JoinCode`) that are easy to type, and which map to full `Room` objects.
 
 Each room will be linked to a game.
 
@@ -36,10 +37,11 @@ Superghost is cool and all, but the cooler thing to do is develop your own game.
 While the demo is turn based, there's no real reason the gameplay couldn't be simultaneous.
 
 ## TODO:
+
 * Deletion of rooms and games when last player leaves.
 * Simple chat functionality
 * Tighter DB security rules. Only authenticated and admitted users should be able to change a `Game` object, etc.
-* Better documentation, code cleanup etc. 
+* Better documentation, code cleanup etc.
 * More tests.
 * More games!
 * Improve UI
@@ -49,7 +51,6 @@ While the demo is turn based, there's no real reason the gameplay couldn't be si
 No. ;)
 
 Well, maybe. I might push some more bugfixes in the future, and I'd love to clean up and document some code, but not sure when I will have the time. Feel free to open pull requests, though!
-
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
