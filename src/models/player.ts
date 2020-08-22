@@ -8,8 +8,7 @@ export enum PlayerType {
 
 export enum PlayerState {
   Playing,
-  Eliminated,
-  AWOL
+  Eliminated
 }
 
 export class Player {
@@ -21,6 +20,7 @@ export class Player {
   @observable playerName: string = '';
   @observable state: PlayerState = PlayerState.Playing;
   @observable playerId: string = '';
+  @observable awol: boolean = false;
 
   constructor(src?: MakeOptional<Player>) {
     const newVals: MakeOptional<Player> = {};

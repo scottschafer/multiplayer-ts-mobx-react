@@ -1,4 +1,4 @@
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react';
 import * as React from 'react';
@@ -9,12 +9,14 @@ import { Link } from 'react-router-dom';
 import { Routes } from '../constants/routes';
 import { firebaseApp } from '../firebase/firebaseApp';
 import { useStores } from '../hooks/useStores';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import './LandingPage.scss';
 
 
 const LandingPage = observer(() => {
 
   const { config, userStore, roomStore } = useStores();
+  const [copied, setCopied] = React.useState(false);
 
   const handleClickAddRoom = useCallback(
     () => {
@@ -55,19 +57,23 @@ const LandingPage = observer(() => {
         {config.factory.renderLandingPageTitle()}
 
         {/* Create a room */}
-        {userStore.user && <>
-          <h2>
-            {!roomStore.createdJoinCode &&
-              <Button onClick={handleClickAddRoom}>Create New Room</Button>}
-            {roomStore.createdJoinCode &&
-              <span>Created room code:
-              <label className='new-room-code'>{roomStore.createdJoinCode}</label><br />
-                <Link to={`${Routes.ROOM.replace(':id', roomStore.createdJoinCode)}`}>Join room</Link>
-              </span>}
-            <br />
-            <br />
-          </h2>
-        </>}
+        <h2>
+          {!roomStore.createdJoinCode &&
+            <Button onClick={handleClickAddRoom}>Create New Room</Button>}
+          {roomStore.createdJoinCode &&
+            <span>Created room code:
+              <label className='new-room-code'>{roomStore.createdJoinCode}</label>
+              <br />
+              <Link to={`${roomStore.relativeCreatedRoomUrl}`}>&nbsp;&nbsp;Go to room</Link>&nbsp;
+
+              <CopyToClipboard text={roomStore.absoluteCreatedRoomUrl}
+                onCopy={() => setCopied(true)}>
+                <Button><FontAwesomeIcon icon={faCopy}></FontAwesomeIcon> Copy link to room</Button>
+              </CopyToClipboard>
+              {copied ? <p style={{ color: 'red' }}>Copied to clipboard</p> : null}
+            </span>}
+          <br />
+        </h2>
 
         {/* Join a room */}
         <h2>To join a room, enter code here:<br />
@@ -81,7 +87,6 @@ const LandingPage = observer(() => {
         </h2>
 
         <br /><br /><br />
-        <h3><a href="https://github.com/scottschafer/multiplayer-ts-mobx-react">Project on github</a></h3>
       </Container>
     </>
   );

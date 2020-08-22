@@ -171,16 +171,16 @@ const SuperGhostRunningGame = observer((props: {
           <ListGroup.Item as="li" key={player.playerId} className={getPlayerClassName(player)}>
             <Card.Header>
               {(player.state === PlayerState.Eliminated) && <FontAwesomeIcon icon={faTimes} />}
-              <label>{player.playerName}</label>
+              <label>{player.playerName} {player.awol && <i>(left room)</i>}</label>
               <h3>{currentGame.playerEvents[player.playerId]}</h3>
 
               {currentGame.currentPlayer
                 && currentGame.currentPlayer.playerId === player.playerId
                 && currentGame.currentPlayer.uid !== user.uid &&
                 <h4>
-                  {(currentGame.currentPlayer.state === PlayerState.Playing) &&
+                  {(!currentGame.currentPlayer.awol) &&
                     <i>Turn in progress - please wait.</i>}
-                  {(currentGame.currentPlayer.state === PlayerState.AWOL) &&
+                  {(currentGame.currentPlayer.awol) &&
                     <span>
                       Player has left the room.
                       

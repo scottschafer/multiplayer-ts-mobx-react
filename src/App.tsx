@@ -1,22 +1,38 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route
-} from 'react-router-dom';
-import './App.css';
+import { Route } from 'react-router-dom';
+import { Router } from 'react-router';
+import { observer } from 'mobx-react';
+import * as firebase from 'firebase';
+import Modal from 'react-bootstrap/esm/Modal';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+
 import { Routes } from './constants/routes';
 import LandingPage from './pages/LandingPage';
 import RoomPage from './pages/RoomPage';
-import SignInPage from './pages/SignInPage';
+import { useStores } from './hooks/useStores';
+import { firebaseAuthConfig } from './firebase/firebaseConfig';
+import './App.css';
 
-const App = () => (
-  <Router>
-    <div className="app">
-      <Route exact={true} path={Routes.LANDING} component={() => <LandingPage />} />
-      <Route exact={true} path={Routes.SIGN_IN} component={() => <SignInPage />} />
-      <Route exact={true} path={Routes.ROOM} component={() => <RoomPage />} />
-    </div>
-  </Router>
-);
+const App = () => {
+  const { userStore, config, history } = useStores();
+  const { user } = userStore;
 
-export default App;
+  return (
+    <Router history={history}>
+      <div className="app">
+        <Route exact={true} path={Routes.LANDING} component={() => <LandingPage />} />
+        <Route exact={true} path={Routes.ROOM} component={() => <RoomPage />} />
+
+        <Modal show={!user && userStore.authenticationRequired && !userStore.waitingToAuthenticate}>
+          <Modal.Body>
+            {config.authentication.renderSignInTitle()}
+            <StyledFirebaseAuth
+              uiConfig={firebaseAuthConfig}
+              firebaseAuth={firebase.auth()} />
+          </Modal.Body>
+        </Modal>
+      </div>
+    </Router>);
+}
+
+export default observer(App);

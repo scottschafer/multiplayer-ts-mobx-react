@@ -10,6 +10,7 @@ import { getCollectionFromDatabase } from '../utils/firebaseUtils';
 import { getUniqueCode } from '../utils/getUniqueCode';
 import { toMinifiedObject } from '../utils/objectUtils';
 import { RootStore } from './rootStore';
+import { Routes } from '../constants/routes';
 
 
 export class RoomStore {
@@ -44,6 +45,14 @@ export class RoomStore {
     return this.roomModelRunner.model;
   }
 
+  @computed get relativeCreatedRoomUrl() {
+    return Routes.ROOM.replace(':id', this.createdJoinCode);
+  }
+
+  @computed get absoluteCreatedRoomUrl() {
+    return window.origin + Routes.ROOM.replace(':id', this.createdJoinCode);
+  }
+
   @computed get loadingState() {
     if (this.localRoom) {
       return LoadingState.Loaded;
@@ -55,14 +64,13 @@ export class RoomStore {
     this.asWriteable.enteredJoinCode = code;
   }
 
-  @action.bound handleLeaveRoomPage() {
+  @action.bound handleLeaveRoom() {
 
     const { currentRoom } = this;
     const { user } = this.rootStore.userStore;
 
     if (user && currentRoom) {
       currentRoom.handleUserLeft(user.uid);
-      // ModelWatcher.updateNow();
     }
   }
 
@@ -142,7 +150,7 @@ export class RoomStore {
 
   constructor(public readonly rootStore: RootStore) {
     window.addEventListener('beforeunload', (event) => {
-      this.handleLeaveRoomPage();
+      this.handleLeaveRoom();
     });
 
     reaction(() => ({
@@ -155,6 +163,10 @@ export class RoomStore {
         if (user && usersInRoom && currentRoom && !usersInRoom[user.uid]) {
           console.log(`adding user to room: ${user.uid}`);
           currentRoom.addUser(new Player(user));
+
+          if (currentRoom.hostIds.includes(user.uid)) {
+            currentRoom.admitUser(user.uid);
+          }
         }
       }, { delay: 100 });
 
@@ -182,9 +194,43 @@ export class RoomStore {
             });
         }
       });
+
+
+    reaction(() => toJS(this.rootStore.routingStore.location),
+      ({ pathname }) => {
+        const roomPrefix = '/room/';
+        if (pathname.startsWith(roomPrefix)) {
+          this.setCurrentJoinCode(pathname.substr(roomPrefix.length));
+        }
+
+
+        // this.asWriteable.joinCodeError = false;
+        // this.asWriteable.joinCodeLink = '';
+
+        // if (enteredJoinCode.length >= 3) {
+        //   const database = firebaseApp.database();
+
+        //   database.ref(`joinCodes/${enteredJoinCode.toLowerCase()}`).once('value', (snapshot) => {
+        //     const val = snapshot.val();
+        //     if (!val) {
+        //       this.asWriteable.joinCodeError = true;
+        //     } else {
+        //       this.asWriteable.joinCodeLink = `room/${enteredJoinCode}`;
+        //     }
+        //   },
+        //     (error) => {
+        //       this.asWriteable.joinCodeError = true;
+        //     });
+        // }
+      }, { fireImmediately: true });
+
+    // roomStore.setCurrentJoinCode(params.id);
+
   }
 
   @action async createNewRoom() {
+    await this.rootStore.userStore.requireAuthentication();
+
     const user = this.rootStore.userStore.user;
     const database = firebaseApp.database();
 

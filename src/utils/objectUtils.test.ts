@@ -21,6 +21,20 @@ test('assignObject', () => {
   updatedObject.b = 'something else';
   assignObject(dstObject, updatedObject);
   expect(dstObject).toMatchObject(updatedObject);
+
+  const obj1 = {
+    a: {
+      b: 1
+    },
+    c: {
+      d: 2
+    }
+  };
+
+  assignObject(obj1, { a: { b: 1 } });
+  expect(obj1).toMatchObject({ a: { b: 1 } });
+
+
 });
 
 test('calculateUpdates', () => {

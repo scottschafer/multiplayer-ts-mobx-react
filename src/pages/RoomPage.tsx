@@ -4,34 +4,29 @@ import React from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import { Link, Prompt, useParams } from 'react-router-dom';
+import { Link, Prompt } from 'react-router-dom';
 import Attendees from '../components/Attendees';
 import { Routes } from '../constants/routes';
-// import { GlobalGameConfig } from '../GameConfig';
 import { useStores } from '../hooks/useStores';
 import { LoadingState } from '../synchronization/synchronizedModelRunner';
-import SignInPage from './SignInPage';
 
 
 const RoomPage = observer(() => {
 
   const { config, userStore, roomStore, gameStore } = useStores();
-  const params = useParams<{ id: string }>();
 
   const { user } = userStore;
 
   const currentRoom = roomStore.currentRoom;
   const currentGame = gameStore.currentGame;
-  roomStore.setCurrentJoinCode(params.id);
+
+  if (!user) {
+    userStore.requireAuthentication();
+    return null;
+  }
 
   return (
     <Container fluid>
-
-      {!user && !userStore.waitingToAuthenticate && <>
-        <Container>
-          <SignInPage></SignInPage>
-        </Container>
-      </>}
 
       {user && <>
 
@@ -39,7 +34,7 @@ const RoomPage = observer(() => {
         <Prompt
           message={
             (location: H.Location, action: H.Action) => {
-              roomStore.handleLeaveRoomPage();
+              roomStore.handleLeaveRoom();
               return true;
             }}></Prompt>
 

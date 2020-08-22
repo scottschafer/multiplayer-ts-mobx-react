@@ -3,8 +3,7 @@ import { SynchronizedModelRunner, LoadingState } from '../synchronization/synchr
 import { Game, GameState } from '../models/game';
 import { MakeOptional, MakeWritable } from '../utils/changeProperties';
 import { RootStore } from './rootStore';
-import { Player, PlayerState } from '../models/player';
-// import { GlobalGameConfig } from '../GameConfig';
+import { Player } from '../models/player';
 
 export class GameStore {
 
@@ -82,14 +81,8 @@ export class GameStore {
       ({ usersInRoom }) => {
         if (this.currentGame) {
           Object.values(this.currentGame.players).forEach(player => {
-            if (!usersInRoom[player.uid]) {
-              player.state = PlayerState.AWOL;
-            } else {
-              if (player.state === PlayerState.AWOL) {
-                player.state = PlayerState.Playing;
-              }
-            }
-          })
+            player.awol = !usersInRoom[player.uid];
+          });
         }
       },
       { delay: 100 });

@@ -30,6 +30,36 @@ export class Room extends SynchronizedModel {
 
   assign(data: object) {
     super.assign(data);
+
+    // console.log('******************************')
+    // console.log(`room.assign(): original data =`);
+    // console.log(toJS(this));
+
+    // console.log(`room.assign(): new data =`);
+    // console.log(toJS(data));
+
+    // super.assign(data);
+    // console.log(`room.assign(): post assign =`);
+    // console.log(toJS(this));
+    // console.log('******************************')
+
+    // const getUpdatedIds = (value: Array<string>) => {
+    //   let result = value;
+    //   let updated = false;
+    //   let updatedResult: Array<string> = [];
+    //   value.forEach(id => {
+    //     if (!this.usersInRoom[id] && !this.hostIds[id]) {
+    //       result = updatedResult;
+    //     } else {
+    //       updatedResult.push(id);
+    //     }
+    //   });
+    //   return result;
+    // }
+    // // debugger;
+    // // // this.asWriteable.hostIds = getUpdatedIds(this.hostIds);
+    // // this.asWriteable.userIdsAdmitted = getUpdatedIds(this.userIdsAdmitted);
+    // // this.asWriteable.userIdsBlocked = getUpdatedIds(this.userIdsBlocked);
   }
 
   addUser(player: Player) {
@@ -39,9 +69,14 @@ export class Room extends SynchronizedModel {
   }
 
   handleUserLeft(uid: string) {
+    // const userIdsAdmitted = this.userIdsAdmitted.filter(id => (id !== uid));
+    // const userIdsBlocked = this.userIdsBlocked.filter(id => (id !== uid));
     const updates = {
-      [`/${this.key}/usersInRoom/${uid}`]: null
+      [`/${this.key}/usersInRoom/${uid}`]: null,
+      // [`/${this.key}/userIdsAdmitted`]: userIdsAdmitted,
+      // [`/${this.key}/userIdsAdmitted`]: userIdsBlocked
     };
+
 
     firebaseApp.database().ref('rooms').update(updates);
     delete this.usersInRoom[uid];
@@ -55,7 +90,8 @@ export class Room extends SynchronizedModel {
 
   @computed get usersWaitingToBeAdmitted() {
     const result = Object.values(this.usersInRoom).filter(user => (
-      !this.userIdsAdmitted.includes(user.uid)
+      user
+      && !this.userIdsAdmitted.includes(user.uid)
       && !this.userIdsBlocked.includes(user.uid)
     ));
     this.sortUsers(result);
@@ -64,7 +100,8 @@ export class Room extends SynchronizedModel {
 
   @computed get usersAdmitted() {
     const result = Object.values(this.usersInRoom).filter(user => (
-      this.userIdsAdmitted.includes(user.uid)
+      user
+      && this.userIdsAdmitted.includes(user.uid)
     ));
     this.sortUsers(result);
     return result;
@@ -72,7 +109,7 @@ export class Room extends SynchronizedModel {
 
   @computed get usersBlocked() {
     const result = Object.values(this.usersInRoom).filter(user => (
-      this.userIdsBlocked.includes(user.uid)
+      user && this.userIdsBlocked.includes(user.uid)
     ));
     this.sortUsers(result);
     return result;
@@ -110,7 +147,11 @@ export class Room extends SynchronizedModel {
   private sortUsers(users: Array<Player>) {
     // first sort by name
     users.sort((a, b) => {
-      return (a.displayName || a.playerName).localeCompare((b.displayName || b.playerName));
+
+      const aVal = (a?.displayName || a?.playerName) || '';
+      const bVal = (b?.displayName || b?.playerName) || '';
+
+      return aVal.localeCompare(bVal);
     });
 
     // now put hosts first

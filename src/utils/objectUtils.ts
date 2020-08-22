@@ -1,13 +1,7 @@
 import { toJS } from "mobx";
-import { getConfig } from '../GameConfig';
 
-function isVerbose() {
-  return getConfig().development.verbose;
-}
-
-function shouldBreakOnErrors() {
-  return getConfig().development.breakOnErrors;
-}
+let verbose = true;
+let breakOnErrors = true;
 
 function simplifyValue(val: any, preventCircular: Set<Object> = null, depth = 0): any {
   if (!val || typeof val === 'string' || typeof val === 'number') {
@@ -52,37 +46,46 @@ export function toMinifiedObject(obj: object): object {
 
 export function assignObject(target: object, src: object, path: string = '/') {
 
+  // check if the src is missing keys that are in the target and handle appropriately
   const srcKeys = Object.keys(src);
   const dstKeys = Object.keys(target);
   const dstKeysSet = new Set<string>(dstKeys);
+
   dstKeysSet.forEach(dstKey => {
     if (!src.hasOwnProperty(dstKey)) {
-      if (target[dstKey] && typeof target[dstKey] === 'object') {
-        const targetFieldVal = target[dstKey];
+      const targetFieldVal = target[dstKey];
+      if (typeof targetFieldVal === 'object') {
+        verbose && console.log(`assignObject: deleting ${path + dstKey}`);
+        // the removed field is an object or array
         if (Array.isArray(targetFieldVal)) {
-          target[dstKey] = [];
+          // if array, just set to empty
+          targetFieldVal.length = 0;
         } else {
-          Object.keys(targetFieldVal).forEach(targetChildKey => {
-            delete targetFieldVal[targetChildKey];
-          });
+          // // if an object, then remove the key ONLY if it's not at the top level of the model. If it's at the top level,
+          // // then it's a field of the model itself (e.g 'usersInRoom') and shouldn't be deleted. But we should delete children
+          // (e.g. usersInRoom/xyz if not present)
+          if (path !== '/') {
+            delete target[dstKey];
+          } else {
+            target[dstKey] = {};
+          }
         }
       }
 
-      isVerbose() && console.log(`assignObject: deleting ${path + dstKey}`);
     }
   });
 
   srcKeys.forEach(key => {
     const srcVal = src[key];
     if (srcVal === undefined || srcVal === null) {
-      isVerbose() && console.log(`assignObject: ${path + key} is null or undefined. This is probably a bug`);
-      if (shouldBreakOnErrors()) {
+      verbose && console.log(`assignObject: ${path + key} is null or undefined. This is probably a bug`);
+      if (breakOnErrors) {
         debugger;
       }
       //delete target[key];
     } else if (typeof srcVal === 'object') {
       if (Array.isArray(srcVal)) {
-        isVerbose() && console.log(`assignObject: assigning array ${path + key}`);
+        verbose && console.log(`assignObject: assigning array ${path + key}`);
         target[key] = srcVal;
       } else {
         if (!target[key]) {
@@ -91,7 +94,7 @@ export function assignObject(target: object, src: object, path: string = '/') {
         assignObject(target[key], srcVal, path + key + '/');
       }
     } else {
-      isVerbose() && console.log(`assignObject: assigning ${path + key} the value of ${srcVal}`);
+      verbose && console.log(`assignObject: assigning ${path + key} the value of ${srcVal}`);
       target[key] = srcVal;
     }
   });
@@ -100,7 +103,7 @@ export function assignObject(target: object, src: object, path: string = '/') {
 
 export function calculateUpdates(oldVal: object, newVal: object, target: object = null, path: string = '/'): object {
   if (newVal === null) {
-    if (shouldBreakOnErrors()) {
+    if (breakOnErrors) {
       debugger;
     }
     console.error(`Error in model: ${path} cannot be null`);
@@ -165,14 +168,25 @@ export function calculateUpdates(oldVal: object, newVal: object, target: object 
 }
 
 
-// (function () {
-//   debugger;
-//   const updates = calculateUpdates
-//     (
-//       { a: 1, b: 3, c: 4 },
-//       { a: 1, b: 2 }
-//     );
+(function () {
+  // debugger;
+  const obj1 = {
+    a: {
+      b: 1
+    },
+    c: {
+      d: 2
+    }
+  };
 
-//   console.log(updates);
-//   debugger;
-// })();
+  assignObject(obj1, { a: { b: 1 } });
+
+  const updates = calculateUpdates
+    (
+      { a: 1, b: 3, c: 4 },
+      { a: 1, b: 2 }
+    );
+
+  console.log(updates);
+  // debugger;
+})();

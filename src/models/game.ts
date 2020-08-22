@@ -95,7 +95,7 @@ export class Game extends SynchronizedModel {
   }
 
   @computed get winningPlayer() {
-    const currentPlayers = Object.values(this.players).filter(player => (player.state === PlayerState.Playing));
+    const currentPlayers = Object.values(this.players).filter(player => (player.state !== PlayerState.Eliminated));
     if (currentPlayers.length === 1) {
       return currentPlayers[0];
     }
