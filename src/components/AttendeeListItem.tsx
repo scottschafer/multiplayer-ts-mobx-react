@@ -69,7 +69,7 @@ const AttendeeListItem = (props: AttendeeListItemProps) => {
     <ListGroup.Item as="li" className={className}>
       <label>
         {(index !== undefined) ? ((index + 1) + '. ') : null}
-        <img alt='profile' src={player.photoURL}></img>
+        {player.photoURL && <img alt='profile' src={player.photoURL}></img>}
         {allowEditPlayerName ?
           <input
             value={playerName}

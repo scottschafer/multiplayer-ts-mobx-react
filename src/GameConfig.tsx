@@ -14,12 +14,12 @@ interface GameConfig {
   },
   authentication: {
     renderSignInTitle: () => JSX.Element,
-    allowEmailSignIn?: boolean,
-    allowGoogleSignIn?: boolean,
-    allowFacebookSignIn?: boolean,
-    allowTwitterSignIn?: boolean,
-    allowGithubSignIn?: boolean,
-    allowAnonymousSignIn?: boolean,
+    // allowEmailSignIn?: boolean,
+    // allowGoogleSignIn?: boolean,
+    // allowFacebookSignIn?: boolean,
+    // allowTwitterSignIn?: boolean,
+    // allowGithubSignIn?: boolean,
+    // allowAnonymousSignIn?: boolean,
   },
   development: {
     verbose: boolean,
@@ -69,8 +69,8 @@ const config: GameConfig = {
   },
   authentication: {
     renderSignInTitle: () => <h3>Sign in required</h3>,
-    allowEmailSignIn: false,
-    allowGoogleSignIn: true
+    // allowEmailSignIn: false,
+    // allowGoogleSignIn: true
   },
   development: {
     verbose: true,

@@ -49,7 +49,7 @@ export class Game extends SynchronizedModel {
       }
     });
     if (cleanup) {
-      debugger;
+      // debugger;
       this.playerPositions = this.playerPositions.filter(id => (!!players[id]));
       Object.keys(this.players).forEach(playerId => {
         if (!this.playerPositions.includes(playerId)) {

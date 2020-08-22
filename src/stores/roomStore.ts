@@ -129,23 +129,7 @@ export class RoomStore {
     if (id === this.currentJoinCode) {
       return;
     }
-
-    const user = this.rootStore.userStore.user;
-    if (this.currentRoom && user && id !== this.currentRoom.joinCode) {
-      this.currentRoom.handleUserLeft(user.uid);
-    }
-
     this.asWriteable.currentJoinCode = id;
-
-    console.log(`setCurrentJoinCode, id=${id}`);
-
-    // find the room key from the join code
-    if (id) {
-      const joinCodes = await this.getJoinCodes();
-
-      const joinCode = joinCodes.find(joinCode => (joinCode.code === id));
-      this.roomModelRunner.key = joinCode?.roomKey || null;
-    }
   }
 
   constructor(public readonly rootStore: RootStore) {
@@ -195,36 +179,36 @@ export class RoomStore {
         }
       });
 
-
     reaction(() => toJS(this.rootStore.routingStore.location),
       ({ pathname }) => {
         const roomPrefix = '/room/';
         if (pathname.startsWith(roomPrefix)) {
-          this.setCurrentJoinCode(pathname.substr(roomPrefix.length));
+          const newRoomCode = pathname.substr(roomPrefix.length).split('?')[0];
+          this.setCurrentJoinCode(newRoomCode);
         }
-
-
-        // this.asWriteable.joinCodeError = false;
-        // this.asWriteable.joinCodeLink = '';
-
-        // if (enteredJoinCode.length >= 3) {
-        //   const database = firebaseApp.database();
-
-        //   database.ref(`joinCodes/${enteredJoinCode.toLowerCase()}`).once('value', (snapshot) => {
-        //     const val = snapshot.val();
-        //     if (!val) {
-        //       this.asWriteable.joinCodeError = true;
-        //     } else {
-        //       this.asWriteable.joinCodeLink = `room/${enteredJoinCode}`;
-        //     }
-        //   },
-        //     (error) => {
-        //       this.asWriteable.joinCodeError = true;
-        //     });
-        // }
       }, { fireImmediately: true });
 
-    // roomStore.setCurrentJoinCode(params.id);
+
+    reaction(() => ({
+      user: this.rootStore.userStore.user,
+      currentJoinCode: this.currentJoinCode
+    }),
+      ({ user, currentJoinCode }) => {
+        if (user && currentJoinCode) {
+          if (this.currentRoom) {
+            this.currentRoom.handleUserLeft(user.uid);
+          }
+
+
+          console.log(`setCurrentJoinCode, id=${currentJoinCode}`);
+
+          // find the room key from the join code
+          this.getJoinCodes().then(joinCodes => {
+            const joinCode = joinCodes.find(joinCode => (joinCode.code === currentJoinCode));
+            this.roomModelRunner.key = joinCode?.roomKey || null;
+          });
+        }
+      });
 
   }
 

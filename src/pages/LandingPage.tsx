@@ -6,7 +6,6 @@ import { useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import { Link } from 'react-router-dom';
-import { Routes } from '../constants/routes';
 import { firebaseApp } from '../firebase/firebaseApp';
 import { useStores } from '../hooks/useStores';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -51,32 +50,13 @@ const LandingPage = observer(() => {
             <Button variant='danger' onClick={handleClickEraseDB}>Erase Database</Button>}
         </p>}
 
-        {!userStore.user &&
-          <Link to={Routes.SIGN_IN}>Sign in</Link>}
+        {/* {!userStore.user &&
+          <Link to={Routes.SIGN_IN}>Sign in</Link>} */}
 
         {config.factory.renderLandingPageTitle()}
 
-        {/* Create a room */}
-        <h2>
-          {!roomStore.createdJoinCode &&
-            <Button onClick={handleClickAddRoom}>Create New Room</Button>}
-          {roomStore.createdJoinCode &&
-            <span>Created room code:
-              <label className='new-room-code'>{roomStore.createdJoinCode}</label>
-              <br />
-              <Link to={`${roomStore.relativeCreatedRoomUrl}`}>&nbsp;&nbsp;Go to room</Link>&nbsp;
-
-              <CopyToClipboard text={roomStore.absoluteCreatedRoomUrl}
-                onCopy={() => setCopied(true)}>
-                <Button><FontAwesomeIcon icon={faCopy}></FontAwesomeIcon> Copy link to room</Button>
-              </CopyToClipboard>
-              {copied ? <p style={{ color: 'red' }}>Copied to clipboard</p> : null}
-            </span>}
-          <br />
-        </h2>
-
         {/* Join a room */}
-        <h2>To join a room, enter code here:<br />
+        {!roomStore.createdJoinCode && <h2>To join a room, enter code here:<br />
           <input
             className={'input-room-code ' + (enteredJoinCode.length ? 'uppercase' : '')}
             value={enteredJoinCode}
@@ -84,9 +64,33 @@ const LandingPage = observer(() => {
             onChange={handleChangeInputJoinRoom}></input><br />
           {joinCodeError && <span><FontAwesomeIcon icon={faExclamationTriangle} /> Room not found!</span>}
           {joinCodeLink && <Link to={joinCodeLink}>Join room</Link>}
-        </h2>
+        </h2>}
 
-        <br /><br /><br />
+
+        {/* Create a room */}
+        {!roomStore.createdJoinCode &&
+          <>
+            <h2>
+              or
+        </h2>
+            <h2>
+              <Button onClick={handleClickAddRoom}>Create New Room</Button>
+              <br />
+            </h2>
+          </>}
+        {roomStore.createdJoinCode &&
+          <>
+            <h2>Created room code:<label className='new-room-code'>{roomStore.createdJoinCode}</label></h2>
+
+            <h2><Link to={`${roomStore.relativeCreatedRoomUrl}`}>Join room now</Link>&nbsp;</h2>
+
+            <CopyToClipboard text={roomStore.absoluteCreatedRoomUrl}
+              onCopy={() => setCopied(true)}>
+              <Button><FontAwesomeIcon icon={faCopy}></FontAwesomeIcon> Copy link to room</Button>
+            </CopyToClipboard>
+            {copied ? <p style={{ color: 'red' }}>Link copied to clipboard - now share it with your friends</p> : null}
+
+          </>}
       </Container>
     </>
   );
