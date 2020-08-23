@@ -1,15 +1,19 @@
-import { computed, reaction, action, toJS } from 'mobx';
-import { SynchronizedModelRunner, LoadingState } from '../synchronization/synchronizedModelRunner';
-import { Game, GameState } from '../models/game';
+import { action, computed, reaction, toJS } from 'mobx';
+import { IGameController } from '../controllers/gameController';
+import { getConfig } from '../config/GameConfig';
+import { GameModel, GameState } from '../models/gameModel';
+import { Player } from '../models/player';
+import { LoadingState, SynchronizedModelRunner } from '../synchronization/synchronizedModelRunner';
 import { MakeOptional, MakeWritable } from '../utils/changeProperties';
 import { RootStore } from './rootStore';
-import { Player } from '../models/player';
 
 export class GameStore {
 
+  readonly controller: IGameController;
+
   // Automatically load and save the game (magic!)
-  private readonly gameModelRunner = new SynchronizedModelRunner<Game>(this.rootStore.config.factory.gameModelFactory, 'games');
-  private localGame: Game = null;
+  private readonly gameModelRunner = new SynchronizedModelRunner<GameModel>(this.rootStore.config.factory.gameModelFactory, 'games');
+  private localGame: GameModel = null;
 
   @computed get currentGame() {
     if (this.localGame) {
@@ -58,14 +62,27 @@ export class GameStore {
     }
 
 
-    this.currentGame.addPlayer(player);
+    this.controller.addPlayer(player);
   }
 
   @action.bound leaveGame(playerToLeave: Player) {
-    this.currentGame.removePlayer(playerToLeave);
+    this.controller.removePlayer(playerToLeave);
   }
 
   constructor(public readonly rootStore: RootStore) {
+
+    reaction(() => ({
+      game: this.currentGame
+    }),
+      ({ game }) => {
+        if (this.controller) {
+          this.controller.cleanup();
+          this.asWriteable.controller = null;
+        }
+        if (game) {
+          this.asWriteable.controller = getConfig().factory.gameControllerFactory(game);
+        }
+      });
 
     // automatically load the game associated with the current room
     reaction(() => this.rootStore.roomStore.currentRoom,
@@ -89,7 +106,7 @@ export class GameStore {
 
     // if the game can't be started
     reaction(() => ({
-      canStartGame: this.currentGame?.canStartGame
+      canStartGame: this.controller?.canStartGame
     }), ({ canStartGame }) => {
       if (!canStartGame) {
         if (this.currentGame?.gameState === GameState.PlayAgain) {
@@ -99,7 +116,7 @@ export class GameStore {
     });
   }
 
-  createGame(params?: MakeOptional<Game>) {
+  createGame(params?: MakeOptional<GameModel>) {
     return new this.rootStore.config.factory.gameModelFactory(params);
   }
 

@@ -5,26 +5,27 @@ import Button from 'react-bootstrap/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
-import { useStores } from '../../hooks/useStores';
-import { GameState } from '../../models/game';
-import { Constants } from '../constants';
-import { currentTime, SuperGhostGame } from '../models/superGhostGame';
-import { Player, PlayerState } from '../../models/player';
+import { useStores } from '../hooks/useStores';
+import { GameState } from '../models/gameModel';
+import { Constants } from './constants';
+import { SuperGhostGameModel } from './superGhostGameModel';
+import { Player, PlayerState } from '../models/player';
 
-import TimeOutBar from './TimeOutBar';
+import TimeOutBar from './components/TimeOutBar';
 import ListGroup from 'react-bootstrap/esm/ListGroup';
 
-import './SuperGhostGamePage.scss';
+import { SuperGhostGameController } from './superGhostGameController';
+import './SuperGhostGameView.scss';
 
-const SuperGhostGamePage = () => {
+const SuperGhostGameView = () => {
   const { userStore, roomStore, gameStore } = useStores();
-
   const { user } = userStore;
-  const currentGame = gameStore.currentGame as SuperGhostGame;
+  const currentGame = gameStore.currentGame as SuperGhostGameModel;
+  const controller = gameStore.controller as SuperGhostGameController;
 
   const handleClickStartGame = useCallback(() => {
-    currentGame.startGame();
-  }, [currentGame]);
+    controller.startGame();
+  }, [controller]);
 
   if (!currentGame) {
     return null;
@@ -41,10 +42,10 @@ const SuperGhostGamePage = () => {
       {(!roomStore.currentUserIsWaitingToBeAdmitted) && <>
 
         {(currentGame.gameState === GameState.NotStarted) && <>
-          {currentGame.canStartGame && roomStore.currentUserIsRoomHost &&
+          {controller.canStartGame && roomStore.currentUserIsRoomHost &&
             <Button onClick={handleClickStartGame}>Start Game</Button>
           }
-          {!currentGame.canStartGame && <>
+          {!controller.canStartGame && <>
             <h1>Waiting for more players...</h1>
             <h3><i>Click "Join" to add another player who will play on this device.</i></h3>
             </>
@@ -54,7 +55,7 @@ const SuperGhostGamePage = () => {
         {/* Play again state, show summary */}
         {(currentGame.gameState === GameState.PlayAgain) &&
           <Card>
-            {currentGame.winningPlayer && <h1>{currentGame.winningPlayer.playerName} wins!</h1>}
+            {controller.winningPlayer && <h1>{controller.winningPlayer.playerName} wins!</h1>}
             <table>
               <tbody>
                 <tr>
@@ -69,7 +70,7 @@ const SuperGhostGamePage = () => {
                     </tr>)}
               </tbody>
             </table>
-            {currentGame.canStartGame &&
+            {controller.canStartGame &&
               <Button onClick={handleClickStartGame}>Play again?</Button>
             }
           </Card>
@@ -79,6 +80,7 @@ const SuperGhostGamePage = () => {
         {(currentGame.gameState === GameState.Started) &&
           <SuperGhostRunningGame
             currentGame={currentGame}
+            controller={controller}
             user={user}></SuperGhostRunningGame>}
       </>}
 
@@ -98,17 +100,19 @@ const SuperGhostInstructions = () => (
 );
 
 const SuperGhostRunningGame = observer((props: {
-  currentGame: SuperGhostGame,
-  user: firebase.User
+  currentGame: SuperGhostGameModel,
+  user: firebase.User,
+  controller: SuperGhostGameController
 }) => {
 
-  const { currentGame, user } = props;
+
+  const { currentGame, user, controller } = props;
   const [startLetter, setStartLetter] = useState('');
   const [endLetter, setEndLetter] = useState('');
   const [challengeText, setChallengeText] = useState('');
-  const { currentFragment: currentWord, superGhost } = currentGame;
+  const { currentFragment, superGhost } = currentGame;
 
-  if (challengeText && !currentGame.challengeInProgress) {
+  if (challengeText && !controller.challengeInProgress) {
     setChallengeText('');
   }
 
@@ -121,32 +125,32 @@ const SuperGhostRunningGame = observer((props: {
   const handleChangeStartLetter = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const val = getLetterFromEvent(e);
     if (val) {
-      currentGame.handlePlayerAddedLetter(val + currentGame.currentFragment);
+      controller.handlePlayerAddedLetter(val + currentGame.currentFragment);
     }
     setStartLetter('');
-  }, [currentGame, setStartLetter]);
+  }, [controller, currentGame, setStartLetter]);
 
   const handleChangeEndLetter = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const val = getLetterFromEvent(e);
     if (val) {
-      currentGame.handlePlayerAddedLetter(currentGame.currentFragment + val);
+      controller.handlePlayerAddedLetter(currentGame.currentFragment + val);
     }
     setEndLetter('');
-  }, [currentGame, setEndLetter]);
+  }, [controller, currentGame, setEndLetter]);
 
   const handleChangeChallengeText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.toUpperCase();
     setChallengeText(val);
-    currentGame.handleChangeChallengeText(val);
-  }, [currentGame, setChallengeText]);
+    controller.handleChangeChallengeText(val);
+  }, [controller, setChallengeText]);
 
   const handleClickResign = useCallback(() => {
-    currentGame.resign();
-  }, [currentGame]);
+    controller.resign();
+  }, [controller]);
 
   const handleClickChallenge = useCallback(() => {
-    currentGame.handleChallenge();
-  }, [currentGame]);
+    controller.handleChallenge();
+  }, [controller]);
 
   const getPlayerClassName = (player: Player) => {
     if (player.state === PlayerState.Eliminated) {
@@ -161,7 +165,7 @@ const SuperGhostRunningGame = observer((props: {
     <div className='playing'>
       <TimeOutBar
         running={true}
-        currentTime={currentTime.get()}
+        currentTime={controller.currentTime}
         startTime={currentGame.startTurnTime}
         timeoutDuration={Constants.MaxSecondsPerTurn * 1000}></TimeOutBar>
 
@@ -195,16 +199,16 @@ const SuperGhostRunningGame = observer((props: {
               && currentGame.currentPlayer.playerId === player.playerId
               && currentGame.currentPlayer.uid === user.uid &&
               <Card>
-                {!currentGame.challengeInProgress &&
+                {!controller.challengeInProgress &&
                   <>
                     <div>
                       <span className='playerInputContainer'>
-                        {(superGhost && currentWord.length > 0)
+                        {(superGhost && currentFragment.length > 0)
                           && <input maxLength={1} placeholder='_'
                             onChange={handleChangeStartLetter}
                             value={startLetter}></input>}
 
-                        {currentWord ? currentWord : <span>&nbsp;</span>}
+                        {currentFragment ? currentFragment : <span>&nbsp;</span>}
 
                         <input maxLength={1} placeholder='_'
                           autoFocus={true}
@@ -213,16 +217,16 @@ const SuperGhostRunningGame = observer((props: {
 
                       </span>
                       <span className='inputHelp'>
-                        {currentWord ? 'Add a letter to the beginning or end.' : 'Type a letter to get started.'}
+                        {currentFragment ? 'Add a letter to the beginning or end.' : 'Type a letter to get started.'}
                       </span>
                     </div>
 
                     {currentGame.messageToCurrentPlayer && <p>{currentGame.messageToCurrentPlayer}</p>}
-                    {currentWord.length >= 3 && <Button variant='warning' onClick={handleClickChallenge}>Challenge</Button>}
+                    {currentFragment.length >= 3 && <Button variant='warning' onClick={handleClickChallenge}>Challenge</Button>}
                   </>
                 }
 
-                {currentGame.challengeInProgress && <>
+                {controller.challengeInProgress && <>
                   <input value={challengeText}
                     onChange={handleChangeChallengeText}
                     placeholder={`word containing ${currentGame.currentFragment}`}
@@ -230,10 +234,10 @@ const SuperGhostRunningGame = observer((props: {
                 </>}
 
 
-                {currentWord.length >= 3 &&
+                {currentFragment.length >= 3 &&
                   <Button variant='danger' onClick={handleClickResign}>I give up!</Button>}
 
-                {currentGame.challengeInProgress && <p>You were challenged by {currentGame.challenger.playerName}. To
+                {controller.challengeInProgress && <p>You were challenged by {currentGame.challenger.playerName}. To
                 beat the challenge, type a word containing {currentGame.currentFragment}.</p>}
 
               </Card>}
@@ -248,4 +252,4 @@ const SuperGhostRunningGame = observer((props: {
   )
 });
 
-export default observer(SuperGhostGamePage);
+export default observer(SuperGhostGameView);

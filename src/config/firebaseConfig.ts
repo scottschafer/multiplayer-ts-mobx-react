@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 
+// Replace with firebase database information
 export const firebaseConfig = {
   apiKey: "AIzaSyA68hVCB6ElXaAYzHmJXXlu5P71wCr5r6E",
   authDomain: "multiplayer-game-f788f.firebaseapp.com",
@@ -12,7 +13,6 @@ export const firebaseConfig = {
 };
 
 export const firebaseAuthConfig = {
-  // signInSuccessUrl: '<url-to-redirect-to-on-success>',
   // Popup signin flow rather than redirect flow.
   signInFlow: 'popup',
   callbacks: {

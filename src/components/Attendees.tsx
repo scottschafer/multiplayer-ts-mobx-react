@@ -4,7 +4,7 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import AttendeeListItem from './AttendeeListItem';
-import { Game } from '../models/game';
+import { GameModel } from '../models/gameModel';
 import { Room } from '../models/room';
 import { Player } from '../models/player';
 import './Attendees.scss';
@@ -13,7 +13,7 @@ import Button from 'react-bootstrap/Button';
 
 export interface AttendeesProps {
   room: Room;
-  game: Game;
+  game: GameModel;
   currentUser: User;
 
   onClickSignOut: () => void;

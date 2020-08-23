@@ -19,6 +19,7 @@ const RoomPage = observer(() => {
 
   const currentRoom = roomStore.currentRoom;
   const currentGame = gameStore.currentGame;
+  const currentGameController = gameStore.controller;
 
   if (!user) {
     userStore.requireAuthentication();
@@ -47,9 +48,9 @@ const RoomPage = observer(() => {
         {(roomStore.loadingState === LoadingState.Loaded && currentRoom) &&
           <Row>
             <Col>
-              {currentGame && config.factory.renderGame()}
+              {currentGame && config.factory.gameViewFactory()}
             </Col>
-            {currentGame?.showAttendeeList &&
+            {currentGameController?.showAttendeeList &&
               <Col xs="auto">
                 <Attendees
                   room={currentRoom}

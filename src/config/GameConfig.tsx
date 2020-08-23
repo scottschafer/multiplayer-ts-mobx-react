@@ -1,12 +1,16 @@
 import React from 'react';
-import { Game } from './models/game';
-import { SuperGhostGame } from './superGhostSample/models/superGhostGame';
-import SuperGhostGamePage from './superGhostSample/components/SuperGhostGamePage';
+import { GameModel } from '../models/gameModel';
+import { SuperGhostGameModel } from '../superGhostSample/superGhostGameModel';
+import SuperGhostGameView from '../superGhostSample/SuperGhostGameView';
+import { IGameController } from '../controllers/gameController';
+import { SuperGhostGameController } from '../superGhostSample/superGhostGameController';
 
 interface GameConfig {
   factory: {
-    gameModelFactory: typeof Game; // model
-    renderGame: () => JSX.Element; // view
+    // model, view, controller factories for the game
+    gameModelFactory: typeof GameModel;
+    gameViewFactory: () => JSX.Element; // view
+    gameControllerFactory: ((game) => IGameController)
     renderLandingPageTitle: () => JSX.Element,
   },
   config: {
@@ -29,10 +33,12 @@ interface GameConfig {
 
 const config: GameConfig = {
   factory: {
-    // override to supply your game model class:
-    gameModelFactory: SuperGhostGame,
+    // override to supply your game model class
+    gameModelFactory: SuperGhostGameModel,
     // override to render your view:
-    renderGame: () => <SuperGhostGamePage></SuperGhostGamePage>,
+    gameViewFactory: () => <SuperGhostGameView></SuperGhostGameView>,
+    gameControllerFactory: (game: SuperGhostGameModel) => (new SuperGhostGameController(game)),
+
     renderLandingPageTitle: () =>
       <>
         <div style={{

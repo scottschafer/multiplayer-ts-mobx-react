@@ -10,7 +10,7 @@ import { Routes } from './constants/routes';
 import LandingPage from './pages/LandingPage';
 import RoomPage from './pages/RoomPage';
 import { useStores } from './hooks/useStores';
-import { firebaseAuthConfig } from './firebase/firebaseConfig';
+import { firebaseAuthConfig } from './config/firebaseConfig';
 import './App.css';
 
 const App = () => {

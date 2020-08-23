@@ -3,7 +3,7 @@ import { SynchronizedModel } from './synchronizedModel';
 import { observable, reaction, toJS } from 'mobx';
 import { MakeWritable } from '../utils/changeProperties';
 import { calculateUpdates } from '../utils/objectUtils';
-import { getConfig } from '../GameConfig';
+import { getConfig } from '../config/GameConfig';
 
 function isVerbose() {
   return getConfig().development.verbose;

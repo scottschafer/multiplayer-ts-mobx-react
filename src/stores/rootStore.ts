@@ -2,7 +2,7 @@ import { UserStore } from './userStore';
 import { RoomStore } from './roomStore';
 import { GameStore } from './gameStore';
 import { ChatStore } from './chatStore';
-import { getConfig } from '../GameConfig';
+import { getConfig } from '../config/GameConfig';
 import { createBrowserHistory } from 'history';
 import MobxReactRouter, { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 

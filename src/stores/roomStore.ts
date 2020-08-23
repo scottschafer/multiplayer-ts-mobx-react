@@ -230,8 +230,14 @@ export class RoomStore {
     const player = new Player({ type: PlayerType.Human, ...user });
 
     // create the game and chat, then create a room and assign the keys to the room
-    const game = this.rootStore.gameStore.createGame();
-    game.addPlayer(player);
+    const game = this.rootStore.gameStore.createGame(
+      {
+        players: {
+          [player.playerId]: player
+        },
+        playerPositions: [player.playerId]
+      }
+    );
 
     const chat = new Chat({ roomCode: joinCode });
 
