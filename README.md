@@ -2,15 +2,21 @@
 
 Demo: [https://multiplayer-game-f788f.web.app](https://multiplayer-game-f788f.web.app)
 
-While this might appear to be a web-based implementation of the game "Superghost" (aka [Lexicant](https://en.wikipedia.org/wiki/Lexicant)), it aims to be something more.
+A serverless technology platform using Mobx, React and Firebase for multiplayer, cloud-based game development. Supports Zoom-like room functionality, painless data persistence and realtime synchronization. Players can be on the same computer or connect to a game from different computers.
 
-It's also a demonstration of a serverless technology stack that uses Mobx, React and Firebase to implement Zoom-like room functionality and painless data persistence and synchronization.
-
-And it's also a platform for creating multiplayer games in the cloud without much effort.
+As a sample game, it includes a web-based implementation of the game "Superghost" (aka [Lexicant](https://en.wikipedia.org/wiki/Lexicant)), it aims to be something more.
 
 ## Developing your own games
 
-Superghost is cool and all, but the cooler thing to do is develop your own game. It's designed to be pretty simple. First, subclass a `Game` model to contain your data. Create a React component to render your view (make it an `observer`). Then link up your model and view factories in `src/GameConfig.tsx`. Boom, you have a multiplayer game in the cloud.
+Superghost is cool and all, but the cooler thing to do is develop your own game. It's designed to be pretty simple. 
+
+You will need to create your own Firebase project and realtme database: see here https://console.firebase.google.com/.
+
+Get your database keys and put them in `src/config/firebaseConfig.ts`. Set up your authentication rules.
+
+Next, subclass your game model, controller and view. See `src/superGhostSample` for an example. Now modify the factories in `src/config/GameConfig.tsx` to point to them.
+
+Boom, you have a multiplayer game in the cloud.
 
 While the demo is turn based, there's no real reason the gameplay couldn't be simultaneous.
 
