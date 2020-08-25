@@ -1,6 +1,22 @@
 {
+  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
+  /* Note: this rules are pretty lax - any authenticated user can do anything. */
   "rules": {
-    ".read": "true",
-    ".write": "auth != null"
+    "rooms": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "chats": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "games": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "joinCodes": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
   }
 }
