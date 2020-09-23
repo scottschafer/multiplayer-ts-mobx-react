@@ -10,7 +10,7 @@ export enum GameState {
 }
 
 export class GameModel extends SynchronizedModel {
-  @observable.ref playerPositions: Array<string> = [];
+  @observable.ref playerOrder: Array<string> = [];
   @observable players: { [key: string]: Player } = {};
   @observable previousPlayerId: string = '';
   @observable currentPlayerIndex: number = -1;
@@ -22,7 +22,7 @@ export class GameModel extends SynchronizedModel {
   }
 
   @computed get currentPlayer(): Player {
-    const { currentPlayerIndex, playerPositions, players } = this;
+    const { currentPlayerIndex, playerOrder: playerPositions, players } = this;
     if (currentPlayerIndex >= 0 && currentPlayerIndex < playerPositions.length) {
       return players[playerPositions[currentPlayerIndex]];
     }
@@ -30,7 +30,7 @@ export class GameModel extends SynchronizedModel {
   }
 
   @computed get playerArray(): Array<Player> {
-    return this.playerPositions.map(id => this.players[id]).filter(player => (!!player));
+    return this.playerOrder.map(id => this.players[id]).filter(player => (!!player));
   }
 
   constructor(src?: MakeOptional<GameModel>) {
@@ -52,7 +52,7 @@ export class GameModel extends SynchronizedModel {
   }
 
   verifyData() {
-    const { players, playerPositions } = this;
+    const { players, playerOrder: playerPositions } = this;
     let cleanup = false;
     if (Object.keys(players).length !== playerPositions.length) {
       cleanup = true;
@@ -66,9 +66,9 @@ export class GameModel extends SynchronizedModel {
     });
     if (cleanup) {
       // debugger;
-      this.playerPositions = this.playerPositions.filter(id => (!!players[id]));
+      this.playerOrder = this.playerOrder.filter(id => (!!players[id]));
       Object.keys(this.players).forEach(playerId => {
-        if (!this.playerPositions.includes(playerId)) {
+        if (!this.playerOrder.includes(playerId)) {
           delete this.players[playerId];
         }
       });

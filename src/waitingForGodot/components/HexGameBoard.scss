@@ -1,0 +1,72 @@
+.HexGameBoard {
+  z-index: 1;
+
+  .btnMove {
+    position: absolute;
+    z-index: 100;
+    padding: 0;
+    width: 40px;
+    font-size: 15px;
+    height: 40px;
+    opacity: .75;
+    background-color: #ffebcd80;
+    color: black;
+    font-family: impact;
+    border-radius: 50%;
+    margin-left: -15px;
+    margin-top: -15px;
+  }
+
+  .btnMove:hover {
+    background-color: goldenrod;
+    color: black;
+  }
+
+  .GODOT {
+    font-size: 18px !important;
+    width: 70px !important;
+    margin-left: -25px !important;
+    margin-top: 30px;
+    font-weight: bolder;
+    color: white;
+    color: black;
+    text-shadow: 1px 1px 2px white;
+    // border: 1px solid rgba(0, 0, 0, .5);
+    font-style: italic;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f3e2c7+0,c19e67+50,b68d4c+51,e9d4b3+100;L+Brown+3D */
+    background: rgb(243, 226, 199);
+    /* Old browsers */
+    background: -moz-linear-gradient(-45deg, rgba(243, 226, 199, 1) 0%, rgba(193, 158, 103, 1) 50%, rgba(182, 141, 76, 1) 51%, rgba(233, 212, 179, 1) 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg, rgba(243, 226, 199, 1) 0%, rgba(193, 158, 103, 1) 50%, rgba(182, 141, 76, 1) 51%, rgba(233, 212, 179, 1) 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(135deg, rgba(243, 226, 199, 1) 0%, rgba(193, 158, 103, 1) 50%, rgba(182, 141, 76, 1) 51%, rgba(233, 212, 179, 1) 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f3e2c7', endColorstr='#e9d4b3', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
+
+    -webkit-box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.75);
+
+  }
+
+  .legend {
+    position: absolute;
+    width: 50px;
+    text-align: center;
+    font-size: 10px;
+    margin-left: -20px;
+    margin-top: -5px;
+  }
+
+  .legendCardClass {
+    font-size: 20px;
+    font-weight: bold;
+    // text-shadow: black 2px;
+    color: black;
+    font-family: cursive;
+    margin-top: -20px;
+    text-shadow: 0px 0px 3px white;
+  }
+}

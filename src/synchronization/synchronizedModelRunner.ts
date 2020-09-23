@@ -135,7 +135,7 @@ export class SynchronizedModelRunner<T extends SynchronizedModel> {
               console.log(`detected updates to memory model ${this.dbPath}: ${JSON.stringify(this.updates, null, 2)}`);
             }
           }
-        });
+        }, { delay: 1 });
 
     this.cancellerModelUpdatesReaction =
       reaction(() => toJS(this.updates),

@@ -11,6 +11,7 @@ import { getUniqueCode } from '../utils/getUniqueCode';
 import { toMinifiedObject } from '../utils/objectUtils';
 import { RootStore } from './rootStore';
 import { Routes } from '../constants/routes';
+import { GameState } from '../models/gameModel';
 
 
 export class RoomStore {
@@ -27,12 +28,18 @@ export class RoomStore {
   private readonly roomModelRunner = new SynchronizedModelRunner<Room>(Room, 'rooms');
 
   @computed get currentUserIsRoomHost() {
+    if (this.localRoom) {
+      return true;
+    }
     const { currentRoom } = this;
     const { user } = this.rootStore.userStore;
     return (currentRoom && user && currentRoom.hostIds.includes(user.uid));
   }
 
   @computed get currentUserIsWaitingToBeAdmitted() {
+    if (this.localRoom) {
+      return false;
+    }
     const { currentRoom } = this;
     const { user } = this.rootStore.userStore;
     return currentRoom && user && !!currentRoom.usersWaitingToBeAdmitted.find(testUser => (testUser.uid === user.uid));
@@ -126,6 +133,12 @@ export class RoomStore {
 
   @action async setCurrentJoinCode(id: string) {
     id = id.toLowerCase();
+    if (id === 'singleplayer') {
+      window.setTimeout(() => {
+        this.playAsSinglePlayer();
+      });
+      return;
+    }
     if (id === this.currentJoinCode) {
       return;
     }
@@ -179,8 +192,9 @@ export class RoomStore {
         }
       });
 
-    reaction(() => toJS(this.rootStore.routingStore.location),
-      ({ pathname }) => {
+    reaction(() => toJS(this.rootStore.routingStore.location?.hash),
+      (hash) => {
+        const pathname = (hash || '').substr(1);
         const roomPrefix = '/room/';
         if (pathname.startsWith(roomPrefix)) {
           const newRoomCode = pathname.substr(roomPrefix.length).split('?')[0];
@@ -198,7 +212,6 @@ export class RoomStore {
           if (this.currentRoom) {
             this.currentRoom.handleUserLeft(user.uid);
           }
-
 
           console.log(`setCurrentJoinCode, id=${currentJoinCode}`);
 
@@ -235,7 +248,7 @@ export class RoomStore {
         players: {
           [player.playerId]: player
         },
-        playerPositions: [player.playerId]
+        playerOrder: [player.playerId]
       }
     );
 
@@ -265,6 +278,41 @@ export class RoomStore {
       roomKey: room.key
     });
     database.ref('joinCodes').child(joinCode).set(toMinifiedObject(joinCodeObj));
+  }
+
+  @action.bound playAsSinglePlayer() {
+
+    const player1 = new Player({
+      playerId: 'human',
+      playerName: 'You',
+      type: PlayerType.Human,
+      uid: '1',
+    });
+    const player2 = new Player({
+      playerId: 'AI',
+      playerName: 'Computer',
+      type: PlayerType.Computer,
+      uid: '1'
+    });
+
+    const game = this.rootStore.gameStore.createGame(
+      {
+        players: {
+          [player1.playerId]: player1,
+          [player2.playerId]: player2
+        },
+        playerOrder: [player1.playerId, player2.playerId]
+      }
+    );
+
+    this.rootStore.gameStore.setLocalGame(game);
+
+    const room = new Room({
+      firebaseBacked: false
+    });
+
+    this.asWriteable.localRoom = room;
+    // this.rootStore.gameStore.controller.startGame();
   }
 
   private get asWriteable() {

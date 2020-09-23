@@ -1,0 +1,28 @@
+.DeckOfCards {
+  position: relative;
+  overflow: visible;
+  width: 90px;
+  height: 120px;
+  z-index: 2000;
+
+  .card {
+    position: absolute;
+    width: 72px;
+    height: 101px;
+    border: 1px solid gray;
+    box-shadow: 2px;
+    background-image: url('./cardback.png');
+    background-size: cover;
+  }
+
+  label {
+    position: absolute;
+    font-family: cursive;
+    color: white;
+    font-size: 22px;
+    left: 28px;
+    top: 33px;
+    font-weight: bold;
+  }
+
+}

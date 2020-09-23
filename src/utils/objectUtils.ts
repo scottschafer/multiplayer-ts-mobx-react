@@ -1,7 +1,8 @@
 import { toJS } from "mobx";
+import { getConfig } from "../config/GameConfig";
 
-let verbose = true;
-let breakOnErrors = true;
+let verbose = getConfig().development.verbose;
+let breakOnErrors = getConfig().development.breakOnErrors;
 
 function simplifyValue(val: any, preventCircular: Set<Object> = null, depth = 0): any {
   if (!val || typeof val === 'string' || typeof val === 'number') {
@@ -59,7 +60,10 @@ export function assignObject(target: object, src: object, path: string = '/') {
         // the removed field is an object or array
         if (Array.isArray(targetFieldVal)) {
           // if array, just set to empty
-          targetFieldVal.length = 0;
+          verbose && console.log(`assignObject: clearing array instead of deleting ${path + dstKey}`);
+          if (targetFieldVal.length) {
+            targetFieldVal.length = 0;
+          }
         } else {
           // // if an object, then remove the key ONLY if it's not at the top level of the model. If it's at the top level,
           // // then it's a field of the model itself (e.g 'usersInRoom') and shouldn't be deleted. But we should delete children
@@ -166,27 +170,3 @@ export function calculateUpdates(oldVal: object, newVal: object, target: object 
 
   return result;
 }
-
-
-(function () {
-  // debugger;
-  const obj1 = {
-    a: {
-      b: 1
-    },
-    c: {
-      d: 2
-    }
-  };
-
-  assignObject(obj1, { a: { b: 1 } });
-
-  const updates = calculateUpdates
-    (
-      { a: 1, b: 3, c: 4 },
-      { a: 1, b: 2 }
-    );
-
-  console.log(updates);
-  // debugger;
-})();

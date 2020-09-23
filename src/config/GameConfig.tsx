@@ -1,11 +1,13 @@
 import React from 'react';
 import { GameModel } from '../models/gameModel';
-import { SuperGhostGameModel } from '../superGhostSample/superGhostGameModel';
-import SuperGhostGameView from '../superGhostSample/SuperGhostGameView';
 import { IGameController } from '../controllers/gameController';
-import { SuperGhostGameController } from '../superGhostSample/superGhostGameController';
+import { GodotGameModel } from '../waitingForGodot/GodotGameModel';
+import GodotGameView from '../waitingForGodot/GodotGameView';
+import { GodotGameController } from '../waitingForGodot/GodotGameController';
 
 interface GameConfig {
+  windowTitle: string,
+  allowSinglePlayer: boolean,
   factory: {
     // model, view, controller factories for the game
     gameModelFactory: typeof GameModel;
@@ -32,12 +34,14 @@ interface GameConfig {
 }
 
 const config: GameConfig = {
+  windowTitle: 'Waiting for Godot',
+  allowSinglePlayer: true,
   factory: {
     // override to supply your game model class
-    gameModelFactory: SuperGhostGameModel,
+    gameModelFactory: GodotGameModel,
     // override to render your view:
-    gameViewFactory: () => <SuperGhostGameView></SuperGhostGameView>,
-    gameControllerFactory: (game: SuperGhostGameModel) => (new SuperGhostGameController(game)),
+    gameViewFactory: () => <GodotGameView></GodotGameView>,
+    gameControllerFactory: (game: GodotGameModel) => (new GodotGameController(game)),
 
     renderLandingPageTitle: () =>
       <>
@@ -47,25 +51,14 @@ const config: GameConfig = {
         }}>
           <h3>built with <a href="https://github.com/scottschafer/multiplayer-ts-mobx-react">multiplayer-ts-mobx-react</a></h3>
           <p><i>A platform for quickly developing multiplayer games in the cloud.</i></p>
+          <p>by Scott Schafer (scott.schafer@gmail.com)</p>
         </div>
 
-        <h1>Superghost!</h1>
-        <p>A game of spelling and betrayal. Also known as "Lexicant". </p>
-        <div style={{ textAlign: 'left' }}>
-          <p>The first player picks a letter. The next player adds a letter to the beginning or end, and so on, but you cannot add a letter if
-          the result is a legal word that's more than three letters long. If you force your opponents to have to make a word, you'll win. Example:</p>
-          <ul>
-            <li>Player #1: A</li>
-            <li>Player #2: AB</li>
-            <li>Player #3: ABB</li>
-            <li>Player #1: CABB</li>
-            <li>Player #2: CABBI</li>
-            <li>Player #3: CABBIE</li>
-            <li>Player #1: <b>$%^@!!*</b></li>
-          </ul>
-          <p>If you don't think a legal word can be made with the letters passed to you, challenge your opponent. They will need to supply a legal word
-            or lose. But if they pass the challenge, they win.</p>
-        </div>
+        <h1>Waiting for Godot</h1>
+        <h2>the board game</h2>
+        <br></br>
+        <br></br>
+
 
       </>,
   },
@@ -79,7 +72,7 @@ const config: GameConfig = {
     // allowGoogleSignIn: true
   },
   development: {
-    verbose: true,
+    verbose: false,
     breakOnErrors: true
   }
 };

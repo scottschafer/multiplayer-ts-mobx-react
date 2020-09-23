@@ -1,4 +1,4 @@
-import { action, computed, reaction, toJS } from 'mobx';
+import { action, computed, reaction, toJS, observable } from 'mobx';
 import { IGameController } from '../controllers/gameController';
 import { getConfig } from '../config/GameConfig';
 import { GameModel, GameState } from '../models/gameModel';
@@ -13,7 +13,7 @@ export class GameStore {
 
   // Automatically load and save the game (magic!)
   private readonly gameModelRunner = new SynchronizedModelRunner<GameModel>(this.rootStore.config.factory.gameModelFactory, 'games');
-  private localGame: GameModel = null;
+  @observable.ref readonly localGame: GameModel = null;
 
   @computed get currentGame() {
     if (this.localGame) {
@@ -27,6 +27,10 @@ export class GameStore {
       return LoadingState.Loaded;
     }
     return this.gameModelRunner.loadingState;
+  }
+
+  @action setLocalGame(game: GameModel) {
+    this.asWriteable.localGame = game;
   }
 
   @action.bound joinGame(player: Player) {
@@ -81,6 +85,9 @@ export class GameStore {
         }
         if (game) {
           this.asWriteable.controller = getConfig().factory.gameControllerFactory(game);
+          if (this.rootStore.roomStore.currentRoom && !this.rootStore.roomStore.currentRoom.firebaseBacked) {
+            this.controller.startGame();
+          }
         }
       });
 
@@ -98,7 +105,11 @@ export class GameStore {
       ({ usersInRoom }) => {
         if (this.currentGame) {
           Object.values(this.currentGame.players).forEach(player => {
-            player.awol = !usersInRoom[player.uid];
+            if (this.rootStore.roomStore.currentRoom?.firebaseBacked === false) {
+              player.awol = false;
+            } else {
+              player.awol = !usersInRoom[player.uid];
+            }
           });
         }
       },

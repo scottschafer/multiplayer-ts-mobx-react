@@ -29,11 +29,11 @@ export class GameController implements IGameController {
   }
 
   @computed get canStartGame() {
-    return this.game.playerPositions.length >= 2;
+    return this.game.playerOrder.length >= 2;
   }
 
   @computed get currentPlayer(): Player {
-    const { currentPlayerIndex, playerPositions, players } = this.game;
+    const { currentPlayerIndex, playerOrder: playerPositions, players } = this.game;
     if (currentPlayerIndex >= 0 && currentPlayerIndex < playerPositions.length) {
       return players[playerPositions[currentPlayerIndex]];
     }
@@ -49,23 +49,23 @@ export class GameController implements IGameController {
   }
 
   @computed get playerArray(): Array<Player> {
-    return this.game.playerPositions.map(id => this.game.players[id]).filter(player => (!!player));
+    return this.game.playerOrder.map(id => this.game.players[id]).filter(player => (!!player));
   }
 
 
   @action addPlayer(player: Player) {
     if (!this.game.players[player.playerId]) {
       this.game.players[player.playerId] = player;
-      this.game.playerPositions = [...this.game.playerPositions, player.playerId];
+      this.game.playerOrder = [...this.game.playerOrder, player.playerId];
     }
-    console.log(`after addPlayer, playerPositions=${JSON.stringify(this.game.playerPositions)}`);
+    console.log(`after addPlayer, playerPositions=${JSON.stringify(this.game.playerOrder)}`);
   }
 
   @action removePlayer(player: Player) {
     if (this.game.players[player.playerId]) {
       delete this.game.players[player.playerId];
     }
-    this.game.playerPositions = this.game.playerPositions.filter(id => (player.playerId !== id));
+    this.game.playerOrder = this.game.playerOrder.filter(id => (player.playerId !== id));
   }
 
   startGame() {
@@ -93,10 +93,10 @@ export class GameController implements IGameController {
   @action goToNextPlayer() {
     this.game.previousPlayerId = this.game.currentPlayer?.playerId || '';
     let newIndex = this.game.currentPlayerIndex;
-    for (let i = 0; i < this.game.playerPositions.length; i++) {
-      newIndex = (newIndex + this.game.turnDirection + this.game.playerPositions.length) % this.game.playerPositions.length;
+    for (let i = 0; i < this.game.playerOrder.length; i++) {
+      newIndex = (newIndex + this.game.turnDirection + this.game.playerOrder.length) % this.game.playerOrder.length;
 
-      if (this.game.players[this.game.playerPositions[newIndex]].state !== PlayerState.Eliminated) {
+      if (this.game.players[this.game.playerOrder[newIndex]].state !== PlayerState.Eliminated) {
         this.game.currentPlayerIndex = newIndex;
         break;
       }

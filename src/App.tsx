@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { Router } from 'react-router';
+// import { Router } from 'react-router';
+import { HashRouter as Router } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import * as firebase from 'firebase';
 import Modal from 'react-bootstrap/esm/Modal';
@@ -11,14 +12,18 @@ import LandingPage from './pages/LandingPage';
 import RoomPage from './pages/RoomPage';
 import { useStores } from './hooks/useStores';
 import { firebaseAuthConfig } from './config/firebaseConfig';
+import { getConfig } from './config/GameConfig';
 import './App.css';
 
 const App = () => {
   const { userStore, config, history } = useStores();
   const { user } = userStore;
 
+  document.title = getConfig().windowTitle;
+
   return (
-    <Router history={history}>
+    // <Router history={history}>
+    <Router>
       <div className="app">
         <Route exact={true} path={Routes.LANDING} component={() => <LandingPage />} />
         <Route exact={true} path={Routes.ROOM} component={() => <RoomPage />} />

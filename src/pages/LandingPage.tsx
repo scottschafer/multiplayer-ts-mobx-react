@@ -16,6 +16,13 @@ const LandingPage = observer(() => {
 
   const { config, userStore, roomStore } = useStores();
   const [copied, setCopied] = React.useState(false);
+  const [singlePlayer, setSinglePlayer] = React.useState(false);
+
+  const handleClickPlayAsSinglePlayer = useCallback(
+    () => {
+      roomStore.playAsSinglePlayer();
+      setSinglePlayer(true);
+    }, [roomStore]);
 
   const handleClickAddRoom = useCallback(
     () => {
@@ -39,6 +46,7 @@ const LandingPage = observer(() => {
 
   const { enteredJoinCode, joinCodeError, joinCodeLink } = roomStore;
 
+
   return (
     <>
       <Container className='LandingPage'>
@@ -50,12 +58,19 @@ const LandingPage = observer(() => {
             <Button variant='danger' onClick={handleClickEraseDB}>Erase Database</Button>}
         </p>}
 
-        {/* {!userStore.user &&
-          <Link to={Routes.SIGN_IN}>Sign in</Link>} */}
-
         {config.factory.renderLandingPageTitle()}
 
+        {config.allowSinglePlayer && <>
+          <div className='game-type-label'>Single Player Options</div>
+          <h2>
+            <Link to='/room/singleplayer'>
+              <Button /* onClick={handleClickPlayAsSinglePlayer} */>Play as single player</Button></Link>
+          </h2>
+          <br />
+        </>}
+
         {/* Join a room */}
+        <div className='game-type-label'>Multiplayer Options</div>
         {!roomStore.createdJoinCode && <h2>To join a room, enter code here:<br />
           <input
             className={'input-room-code ' + (enteredJoinCode.length ? 'uppercase' : '')}
@@ -72,7 +87,7 @@ const LandingPage = observer(() => {
           <>
             <h2>
               or
-        </h2>
+            </h2>
             <h2>
               <Button onClick={handleClickAddRoom}>Create New Room</Button>
               <br />
@@ -83,7 +98,6 @@ const LandingPage = observer(() => {
             <h2>Created room code:<label className='new-room-code'>{roomStore.createdJoinCode}</label></h2>
 
             <h2><Link to={`${roomStore.relativeCreatedRoomUrl}`}>Join room now</Link>&nbsp;</h2>
-
             <CopyToClipboard text={roomStore.absoluteCreatedRoomUrl}
               onCopy={() => setCopied(true)}>
               <Button><FontAwesomeIcon icon={faCopy}></FontAwesomeIcon> Copy link to room</Button>

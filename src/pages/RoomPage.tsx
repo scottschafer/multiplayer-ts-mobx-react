@@ -21,7 +21,11 @@ const RoomPage = observer(() => {
   const currentGame = gameStore.currentGame;
   const currentGameController = gameStore.controller;
 
-  if (!user) {
+  if (!currentGame || !currentRoom) {
+    return null;
+  }
+
+  if (!user && currentRoom.firebaseBacked) {
     userStore.requireAuthentication();
     return null;
   }
@@ -29,45 +33,46 @@ const RoomPage = observer(() => {
   return (
     <Container fluid>
 
-      {user && <>
+      {/* user && */
+        <>
 
-        {/* Handle when leaving room */}
-        <Prompt
-          message={
-            (location: H.Location, action: H.Action) => {
-              roomStore.handleLeaveRoom();
-              return true;
-            }}></Prompt>
+          {/* Handle when leaving room */}
+          <Prompt
+            message={
+              (location: H.Location, action: H.Action) => {
+                roomStore.handleLeaveRoom();
+                return true;
+              }}></Prompt>
 
-        {(roomStore.loadingState === LoadingState.Loading) && <p>loading...</p>}
-        {(roomStore.loadingState === LoadingState.NotFound) && <h1>
-          Room not found! <Link to={Routes.LANDING}>X</Link>
-        </h1>}
+          {(roomStore.loadingState === LoadingState.Loading) && <p>loading...</p>}
+          {(roomStore.loadingState === LoadingState.NotFound) && <h1>
+            Room not found! <Link to={Routes.LANDING}>X</Link>
+          </h1>}
 
 
-        {(roomStore.loadingState === LoadingState.Loaded && currentRoom) &&
-          <Row>
-            <Col>
-              {currentGame && config.factory.gameViewFactory()}
-            </Col>
-            {currentGameController?.showAttendeeList &&
-              <Col xs="auto">
-                <Attendees
-                  room={currentRoom}
-                  game={currentGame}
-                  currentUser={userStore.user}
-                  onClickSignOut={userStore.signOut}
-                  onClickJoinGame={gameStore.joinGame}
-                  onClickLeaveGame={gameStore.leaveGame}
-                  onClickAdmitUser={roomStore.admitUser}
-                  onClickBlockUser={roomStore.blockUser}
-                  onClickUnblockUser={roomStore.unblockUser}
-                  onClickEjectUser={roomStore.ejectUser}
-                ></Attendees>
-              </Col>}
+          {(roomStore.loadingState === LoadingState.Loaded && currentRoom) &&
+            <Row>
+              <Col>
+                {currentGame && config.factory.gameViewFactory()}
+              </Col>
+              {currentGameController?.showAttendeeList && user &&
+                <Col xs="auto">
+                  <Attendees
+                    room={currentRoom}
+                    game={currentGame}
+                    currentUser={userStore.user}
+                    onClickSignOut={userStore.signOut}
+                    onClickJoinGame={gameStore.joinGame}
+                    onClickLeaveGame={gameStore.leaveGame}
+                    onClickAdmitUser={roomStore.admitUser}
+                    onClickBlockUser={roomStore.blockUser}
+                    onClickUnblockUser={roomStore.unblockUser}
+                    onClickEjectUser={roomStore.ejectUser}
+                  ></Attendees>
+                </Col>}
 
-          </Row>}
-      </>}
+            </Row>}
+        </>}
     </Container>
   );
 });
