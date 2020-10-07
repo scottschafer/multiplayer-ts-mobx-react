@@ -1,9 +1,9 @@
 import React from 'react';
 import { GameModel } from '../models/gameModel';
 import { IGameController } from '../controllers/gameController';
-import { GodotGameModel } from '../waitingForGodot/GodotGameModel';
-import GodotGameView from '../waitingForGodot/GodotGameView';
-import { GodotGameController } from '../waitingForGodot/GodotGameController';
+import { BattlebotsGameModel } from '../battleBots/BattlebotsGameModel';
+import BattlebotsGameView from '../battleBots/BattlebotsGameView';
+import { BattlebotsGameController } from '../battleBots/BattlebotsGameController';
 
 interface GameConfig {
   windowTitle: string,
@@ -38,10 +38,10 @@ const config: GameConfig = {
   allowSinglePlayer: true,
   factory: {
     // override to supply your game model class
-    gameModelFactory: GodotGameModel,
+    gameModelFactory: BattlebotsGameModel,
     // override to render your view:
-    gameViewFactory: () => <GodotGameView></GodotGameView>,
-    gameControllerFactory: (game: GodotGameModel) => (new GodotGameController(game)),
+    gameViewFactory: () => <BattlebotsGameView></BattlebotsGameView>,
+    gameControllerFactory: (game: BattlebotsGameModel) => (new BattlebotsGameController(game)),
 
     renderLandingPageTitle: () =>
       <>

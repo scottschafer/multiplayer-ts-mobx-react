@@ -14,12 +14,20 @@ import { useStores } from './hooks/useStores';
 import { firebaseAuthConfig } from './config/firebaseConfig';
 import { getConfig } from './config/GameConfig';
 import './App.css';
+import TestScene from './TestScene';
 
 const App = () => {
   const { userStore, config, history } = useStores();
   const { user } = userStore;
 
   document.title = getConfig().windowTitle;
+
+  // return (
+  //   <div className="App">
+  //     <h1>hi</h1>
+  //     <TestScene />
+  //   </div>
+  // );
 
   return (
     // <Router history={history}>
